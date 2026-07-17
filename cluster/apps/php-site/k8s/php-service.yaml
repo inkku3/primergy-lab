@@ -1,0 +1,13 @@
+# k8s/php-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: php-service
+  namespace: apps
+spec:
+  selector:
+    app: php-site
+  ports:
+    - port: 9000
+      targetPort: 9000
+  type: ClusterIP

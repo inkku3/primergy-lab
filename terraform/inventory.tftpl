@@ -1,0 +1,18 @@
+# terraform/inventory.tftpl
+[control_plane]
+${control_plane_ip} ansible_user=ansible
+
+[workers]
+%{ for ip in worker_ips ~}
+${ip} ansible_user=ansible
+%{ endfor ~}
+
+[utility]
+${utility_ip} ansible_user=ansible
+
+[cloudflared]
+${cloudflared_ip} ansible_user=ansible
+
+[k3s_cluster:children]
+control_plane
+workers

@@ -1,0 +1,45 @@
+# ansible/playbook.yml
+---
+- name: Wait for all nodes to be ready
+  hosts: all
+  gather_facts: true
+  tasks:
+    - import_tasks: tasks/wait_ready.yml
+
+- name: Install Docker on utility VM
+  hosts: utility
+  become: true
+  tasks:
+    - import_tasks: tasks/docker.yml
+
+- name: Make k3s control plane
+  hosts: control_plane
+  become: true
+  tasks:
+    - import_tasks: tasks/k3s_server.yml
+
+- name: Join k3s workers to cluster
+  hosts: workers
+  become: true
+  tasks:
+    - import_tasks: tasks/k3s_agent.yml
+
+- name: Fetch kubeconfig to utility VM
+  hosts: utility
+  become: true
+  tasks:
+    - import_tasks: tasks/kubeconfig.yml
+
+- name: Install cloudflared tunnel
+  hosts: cloudflared
+  become: true
+  vars_files:
+    - vars/secrets.yml
+  tasks:
+    - import_tasks: tasks/cloudflared.yml
+
+# task to deploy apps would go here like this..
+# - name: Deploy application manifests
+#   hosts: utility
+#   tasks:
+#     - import_tasks: tasks/deploy_app.yml

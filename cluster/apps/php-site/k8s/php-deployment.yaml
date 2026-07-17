@@ -1,0 +1,23 @@
+# cluster/apps/php-site/k8s/php-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: php-deployment
+  namespace: apps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: php-site
+  template:
+    metadata:
+      labels:
+        app: php-site
+    spec:
+      imagePullSecrets:
+        - name: ghcr-secret
+      containers:
+        - name: php
+          image: ghcr.io/inkku3/primergy-lab-php:latest
+          ports:
+            - containerPort: 9000

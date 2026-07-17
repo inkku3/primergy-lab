@@ -1,0 +1,32 @@
+# ansible/tasks/k3s_server.yml
+- name: Check if k3s is already installed
+  stat:
+    path: /usr/local/bin/k3s
+  register: k3s_installed
+
+- name: Install k3s server
+  shell: curl -sfL https://get.k3s.io | sh -
+  when: not k3s_installed.stat.exists # if already installed skip
+
+- name: Wait for k3s node-token file to exist
+  wait_for:
+    path: /var/lib/rancher/k3s/server/node-token
+    timeout: 120
+
+- name: Read k3s node token
+  slurp: 
+    src: /var/lib/rancher/k3s/server/node-token
+  register: k3s_node_token_raw # slurp encodes this in base64
+
+- name: Set node token fact
+  set_fact: # set as global variable
+    k3s_node_token: "{{ k3s_node_token_raw.content | b64decode | trim }}" 
+                    # use b64decode to access, strip excess spaces with trim
+
+- name: Wait for control plane to report Ready
+  command: k3s kubectl get nodes -o jsonpath='{.items[0].status.conditions[?(@.type=="Ready")].status}' 
+  register: cp_ready # save node state
+  until: cp_ready.stdout == "True" # repeat until all nodes are Ready
+  retries: 20
+  delay: 10
+  changed_when: false # don't log as changed task

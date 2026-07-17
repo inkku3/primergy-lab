@@ -1,1 +1,7 @@
-/src/**
+/cluster/apps/php-site/src/**
+/cluster/apps/php-site/notes.txt
+/ansible/texts.txt
+*.tfvars
+*.backup
+**/.terraform/
+/ansible/vars/secrets.yml

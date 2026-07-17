@@ -16,6 +16,7 @@ services:
       default:
         aliases:
           - php-service
+          - php-site
 
   registry:
     image: registry:2
