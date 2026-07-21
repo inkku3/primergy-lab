@@ -38,8 +38,12 @@
   tasks:
     - import_tasks: tasks/cloudflared.yml
 
-# task to deploy apps would go here like this..
-# - name: Deploy application manifests
-#   hosts: utility
-#   tasks:
-#     - import_tasks: tasks/deploy_app.yml
+- name: Install Argo CD
+  hosts: utility
+  tasks:
+    - import_tasks: tasks/argocd.yml
+
+- name: Register Argo CD applications
+  hosts: utility
+  tasks:
+    - import_tasks: tasks/argocd_apps.yml

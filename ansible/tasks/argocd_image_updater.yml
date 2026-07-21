@@ -1,0 +1,6 @@
+- name: Install Argo CD Image Updater
+  kubernetes.core.k8s:
+    kubeconfig: ~/.kube/config
+    state: present
+    namespace: argocd
+    src: https://raw.githubusercontent.com/argoproj-labs/argocd-image-updater/master/manifests/install.yaml

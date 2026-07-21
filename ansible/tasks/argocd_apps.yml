@@ -1,0 +1,6 @@
+---
+- name: Deploy PHP Site Application
+  kubernetes.core.k8s:
+    kubeconfig: /home/ansible/.kube/config
+    state: present
+    definition: "{{ lookup('ansible.builtin.file', playbook_dir + '/../cluster/argocd/php-site.yaml') }}"

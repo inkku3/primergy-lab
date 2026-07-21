@@ -1,0 +1,37 @@
+---
+- name: Ensure kubernetes Python package is installed
+  ansible.builtin.package:
+    name: python3-kubernetes
+    state: present
+  become: true
+
+# 2. Argo CD namespace task does NOT use become: true
+- name: Create Argo CD namespace
+  kubernetes.core.k8s:
+    kubeconfig: /home/ansible/.kube/config
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: argocd
+
+- name: Install Argo CD
+  kubernetes.core.k8s:
+    kubeconfig: /home/ansible/.kube/config
+    state: present
+    namespace: argocd
+    src: https://raw.githubusercontent.com/argoproj/argo-cd/v2.10.4/manifests/install.yaml
+
+- name: Wait for Argo CD server deployment
+  kubernetes.core.k8s_info:
+    kubeconfig: /home/ansible/.kube/config
+    api_version: apps/v1
+    kind: Deployment
+    namespace: argocd
+    name: argocd-server
+    wait: yes
+    wait_condition:
+      type: Available
+      status: "True"
+    wait_timeout: 300
