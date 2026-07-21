@@ -8,7 +8,7 @@
 
 # Authenticates Image Updater against ghcr.io for registry/tag lookups only.
 # This is NOT used for git write-back
-- name: Create GHCR registry credentials for Image Updater
+- name: Create GHCR registry credentials
   kubernetes.core.k8s:
     kubeconfig: /home/ansible/.kube/config
     state: present
@@ -18,7 +18,6 @@
       metadata:
         name: ghcr-secret
         namespace: argocd
-      type: Opaque
-      stringData:
-        username: "{{ github_username }}"
-        password: "{{ github_pat }}"
+      type: kubernetes.io/dockerconfigjson
+      data:
+        .dockerconfigjson: "{{ lookup('template', 'dockerconfig.json.j2') | b64encode }}"
