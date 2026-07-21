@@ -38,7 +38,9 @@ jobs:
           context: ./cluster/apps/php-site
           file: ./cluster/apps/php-site/php/Dockerfile
           push: true
-          tags: ${{ env.PHP_IMAGE }}:${{ github.sha }}
+          tags: |
+            ${{ env.NGINX_IMAGE }}:${{ github.sha }}
+            ${{ env.NGINX_IMAGE }}:latest
 
       - name: Build and push Nginx image
         uses: docker/build-push-action@v6
@@ -46,6 +48,7 @@ jobs:
           context: ./cluster/apps/php-site
           file: ./cluster/apps/php-site/nginx/Dockerfile
           push: true
-          tags: ${{ env.NGINX_IMAGE }}:${{ github.sha }}
-
+          tags: |
+            ${{ env.NGINX_IMAGE }}:${{ github.sha }}
+            ${{ env.NGINX_IMAGE }}:latest
 
