@@ -1,4 +1,13 @@
 # ansible/tasks/cloudflared.yml
+- name: Remove conflicting legacy apt repository files
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /etc/apt/sources.list.d/cloudflared.list
+    - /etc/apt/sources.list.d/cloudflare.list
+    - /usr/share/keyrings/cloudflare-main.gpg
+
 - name: Add cloudflared apt repository
   ansible.builtin.deb822_repository:
     name: cloudflared

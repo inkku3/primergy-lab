@@ -1,5 +1,6 @@
 /cluster/apps/php-site/src/**
 /cluster/apps/php-site/notes.txt
+/cluster/apps/keittokirja-backup/
 /ansible/texts.txt
 *.tfvars
 *.backup
