@@ -5,6 +5,52 @@
     state: present
   become: true
 
+- name: Register GitHub repository with Argo CD
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: github-repo
+        namespace: argocd
+        labels:
+          argocd.argoproj.io/secret-type: repository
+      stringData:
+        type: git
+        url: https://github.com/inkku3/primergy-lab.git
+        username: "{{ github_username }}"
+        password: "{{ github_pat }}"
+
+- name: Create GitHub Secret for Image Pulling and Git Write-back
+  kubernetes.core.k8s:
+    kubeconfig: ~/.kube/config
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: ghcr-secret
+        namespace: argocd
+      type: Opaque
+      stringData:
+        username: "{{ github_username }}"
+        password: "{{ github_pat }}"
+
+- name: Create GHCR image pull secret
+  kubernetes.core.k8s:
+    state: present
+    namespace: apps
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: ghcr-secret
+        namespace: apps
+      type: kubernetes.io/dockerconfigjson
+      data:
+        .dockerconfigjson: "{{ lookup('template', 'dockerconfig.json.j2') | b64encode }}"
+
 # 2. Argo CD namespace task does NOT use become: true
 - name: Create Argo CD namespace
   kubernetes.core.k8s:

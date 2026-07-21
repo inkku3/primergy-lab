@@ -40,6 +40,8 @@
 
 - name: Install Argo CD
   hosts: utility
+  vars_files:
+    - vars/secrets.yml
   tasks:
     - import_tasks: tasks/argocd.yml
 
