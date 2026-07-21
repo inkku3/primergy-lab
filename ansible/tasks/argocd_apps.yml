@@ -1,6 +1,12 @@
----
-- name: Deploy PHP Site Application
+- name: Find Argo CD Application manifests
+  ansible.builtin.set_fact:
+    argocd_app_manifests: "{{ query('ansible.builtin.fileglob', playbook_dir + '/../cluster/argocd/*.yaml') }}"
+
+- name: Apply Argo CD Applications
   kubernetes.core.k8s:
     kubeconfig: /home/ansible/.kube/config
     state: present
-    definition: "{{ lookup('ansible.builtin.file', playbook_dir + '/../cluster/argocd/php-site.yaml') }}"
+    definition: "{{ lookup('ansible.builtin.file', item) | from_yaml }}"
+  loop: "{{ argocd_app_manifests }}"
+  loop_control:
+    label: "{{ item | basename }}"

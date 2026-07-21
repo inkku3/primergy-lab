@@ -39,8 +39,8 @@ jobs:
           file: ./cluster/apps/php-site/php/Dockerfile
           push: true
           tags: |
-            ${{ env.NGINX_IMAGE }}:${{ github.sha }}
-            ${{ env.NGINX_IMAGE }}:latest
+            ${{ env.PHP_IMAGE }}:${{ github.sha }}
+            ${{ env.PHP_IMAGE }}:latest
 
       - name: Build and push Nginx image
         uses: docker/build-push-action@v6

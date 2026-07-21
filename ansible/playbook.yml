@@ -45,7 +45,16 @@
   tasks:
     - import_tasks: tasks/argocd.yml
 
+- name: Install Argo CD image updater
+  hosts: utility
+  vars_files:
+    - vars/secrets.yml
+  tasks:
+    - import_tasks: tasks/argocd_image_updater.yml
+
 - name: Register Argo CD applications
   hosts: utility
   tasks:
     - import_tasks: tasks/argocd_apps.yml
+
+

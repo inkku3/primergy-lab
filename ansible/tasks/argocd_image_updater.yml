@@ -1,6 +1,24 @@
+---
 - name: Install Argo CD Image Updater
   kubernetes.core.k8s:
-    kubeconfig: ~/.kube/config
+    kubeconfig: /home/ansible/.kube/config
     state: present
     namespace: argocd
-    src: https://raw.githubusercontent.com/argoproj-labs/argocd-image-updater/master/manifests/install.yaml
+    src: https://raw.githubusercontent.com/argoproj-labs/argocd-image-updater/release-0.17/manifests/install.yaml
+
+# Authenticates Image Updater against ghcr.io for registry/tag lookups only.
+# This is NOT used for git write-back
+- name: Create GHCR registry credentials for Image Updater
+  kubernetes.core.k8s:
+    kubeconfig: /home/ansible/.kube/config
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: ghcr-secret
+        namespace: argocd
+      type: Opaque
+      stringData:
+        username: "{{ github_username }}"
+        password: "{{ github_pat }}"
