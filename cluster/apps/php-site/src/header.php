@@ -22,7 +22,7 @@ $pageTitle = $pageTitle ?? "inkku - place";
 
 <style>
     a {
-        color: #b02d10; 
+        color: #cf3c17; 
         text-decoration: none;
         transition: color 0.1s ease-in-out;
     }
@@ -186,11 +186,23 @@ $pageTitle = $pageTitle ?? "inkku - place";
             <div class="dropdown-content">
                 <a href="https://minecraft.inkku.xyz">Server</a>
                 <a href="https://minecraft.inkku.xyz/implementation/">Info</a>
+                <a href="https://minecraft.inkku.xyz">Live Map (TBD)</a>
+
 
             </div>
         </div>
-        <!-- <a href="https://homeassistant.inkku.xyz" class="nav-link">HA</a> -->
-        <a href="https://inkku.xyz/projects" class="nav-link">Projects</a>
+    <div class="dropdown">
+        <button class="dropbtn" onclick="toggleMobileDropdown(this)">Infrastructure</button>
+            <div class="dropdown-content">
+
+                <a href="https://minecraft.inkku.xyz">Provisioning</a>
+                <a href="https://minecraft.inkku.xyz/implementation/">GitOps</a>
+                <a href="https://minecraft.inkku.xyz">Networking</a>
+            </div>
+        </div>
+    
+        <a href="https://inkku.xyz/projects">
+            <button class="dropbtn"">Projects</button></a>
         <div class="dropdown">
             <button class="dropbtn" onclick="toggleMobileDropdown(this)">About</button>            
             <div class="dropdown-content">
@@ -200,6 +212,8 @@ $pageTitle = $pageTitle ?? "inkku - place";
         </div>
     </div>
 </div>
+
+
 <!-- desktop navigation -->
 <div id="top-navigation">
     <div id="links-container">
@@ -208,10 +222,19 @@ $pageTitle = $pageTitle ?? "inkku - place";
             <div class="dropdown-content">
                 <a href="https://minecraft.inkku.xyz">Server</a>
                 <a href="https://minecraft.inkku.xyz/implementation/">Info</a>
+                <a href="https://minecraft.inkku.xyz">Live Map (TBD)</a>
+
 
             </div>
         </div>
-       <!-- <a href="https://homeassistant.inkku.xyz" class="nav-link">HA</a> -->
+        <div class="dropdown">
+        <a href="https://inkku.xyz/infrastructure" class="nav-link"><button class="dropbtn">Infrastructure</button></a>
+        <div class="dropdown-content">
+                <a href="https://minecraft.inkku.xyz">Provisioning</a>
+                <a href="https://minecraft.inkku.xyz/implementation/">GitOps</a>
+                <a href="https://minecraft.inkku.xyz">Networking</a>
+            </div>
+    </div>
         <a href="https://inkku.xyz/projects" class="nav-link">Projects</a>
         <div class="dropdown">
             <button class="dropbtn">About</button>

@@ -1,5 +1,5 @@
 <div id="bottom-header">
-    minimal HTML website served from a Debian 12 server via Nginx
+    minimal HTML website served to you via PHP
   </div>
 </div>
 <script>

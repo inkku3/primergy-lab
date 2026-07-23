@@ -144,6 +144,8 @@ width: 100%;
 }
 
 .dropbtn:hover {
+          color: #eb742f; 
+
   background-color: rgba(0, 0, 0, 0.6);
 }
 .overlay-menu {
@@ -198,12 +200,14 @@ pointer-events: none;
   background-color: rgba(0, 0, 0, 0.3);
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
   font-size: 1.0rem;
-  line-height: 1.7;
+  line-height: 1.5;
   margin-bottom: 250px;
 }
 .infostack{
   margin-left: 10px;
-  font-size: 1.0rem;
+  font-size: 0.95rem;
+  line-height: 1.6;
+
 }
 /* For portfolio page */
 .project-section {
@@ -456,6 +460,37 @@ pointer-events: none;
   animation-name: zoom;
   animation-duration: 0.6s;
 }
+.content-image {
+  display: block !important;
+  width: 100% !important;
+  max-width: 800px;
+  height: auto;
+  margin: 20px auto !important;
+  border-radius: 8px;
+}
+.content-image-small {
+  display: block !important;
+  width: 100% !important;
+  max-width: 500px;
+  height: auto;
+  margin: 20px auto !important;
+  border-radius: 8px;
+}
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: 2px solid #00000000;
+  text-align: left;
+  padding: 9px;
+}
+
+tr:nth-child(even) {
+  background-color: #0000001e;
+}
 @keyframes zoom {
   from {transform: scale(0.1)} 
   to {transform: scale(1)}
@@ -629,4 +664,12 @@ pointer-events: none;
     padding: 10px;
     cursor: pointer;
   }
+.content-image {
+  display: block !important;
+  width: 100% !important;
+  max-width: 600px;
+  height: auto;
+  margin: 20px auto !important;
+  border-radius: 8px;
+}
 }
