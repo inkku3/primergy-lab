@@ -62,7 +62,7 @@ spec:
             - name: WHITELIST_FILE
               value: "/secrets/whitelist.txt"
             - name: EXISTING_WHITELIST_FILE
-              value: "MERGE"
+              value: "SKIP"
             - name: DIFFICULTY
               value: "normal"
             - name: PVP
