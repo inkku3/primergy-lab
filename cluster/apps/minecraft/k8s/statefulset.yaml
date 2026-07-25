@@ -29,6 +29,7 @@ spec:
                 secretKeyRef:
                   name: discordsrv-config
                   key: token
+
           volumeMounts:
             - name: data
               mountPath: /data
@@ -47,7 +48,8 @@ spec:
             - name: MAX_PLAYERS
               value: "10"
             - name: MOTD
-              value: "Primergy Lab"
+              value: |
+                A %TYPE% server on %VERSION%
             - name: ENABLE_RCON
               value: "true"
             - name: RCON_PORT
@@ -57,6 +59,25 @@ spec:
                 secretKeyRef:
                   name: paper-rcon
                   key: password
+            - name: WHITELIST_FILE
+              value: "/secrets/whitelist.txt"
+            - name: EXISTING_WHITELIST_FILE
+              value: "MERGE"
+            - name: DIFFICULTY
+              value: "normal"
+            - name: PVP
+              value: "true"
+            - name: SPAWN_PROTECTION
+              value: "0"
+            - name: VIEW_DISTANCE
+              value: "10"
+            - name: OPS
+              value: |
+                Inkku_
+            - name: ICON
+              value: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Macys_Thanksgiving_Parade_%2838589510752%29.jpg/960px-Macys_Thanksgiving_Parade_%2838589510752%29.jpg?_=20220107104100"
+            - name: SEED
+              value: "-1701815224735573849"
           ports:
             - containerPort: 25565
               name: game

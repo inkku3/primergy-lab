@@ -8,7 +8,7 @@ spec:
     app: paper
   ports:
     - name: game
-      port: 25565
+      port: 25555
       targetPort: 25565
 ---
 apiVersion: v1

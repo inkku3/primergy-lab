@@ -2,6 +2,8 @@
 /cluster/apps/keittokirja-backup/
 /cluster/apps/cookbook/
 /cluster/apps/minecraft/k8s/secret.yaml
+cluster/apps/minecraft/k8s/secrets/whitelist.txt
+
 /ansible/texts.txt
 *.tfvars
 *.backup
