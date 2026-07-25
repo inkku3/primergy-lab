@@ -1,0 +1,69 @@
+<mxfile host="app.diagrams.net" pages="2">
+  <diagram name="Page-1" id="m1onUpZiXNgSR6F-bfzq">
+    <mxGraphModel dx="975" dy="540" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="q3eSmmJyoQMKX1ps9Lj2-0" />
+        <mxCell id="q3eSmmJyoQMKX1ps9Lj2-1" parent="q3eSmmJyoQMKX1ps9Lj2-0" />
+        <mxCell id="tCd5-_Isohu8jhAg2T7s-6" parent="q3eSmmJyoQMKX1ps9Lj2-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;" value="" vertex="1">
+          <mxGeometry height="290" width="450" x="250" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tCd5-_Isohu8jhAg2T7s-7" parent="q3eSmmJyoQMKX1ps9Lj2-1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="&lt;div&gt;Fujitsu Primergy RX2530 M2&lt;/div&gt;" vertex="1">
+          <mxGeometry height="30" width="185" x="382.5" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tCd5-_Isohu8jhAg2T7s-8" parent="q3eSmmJyoQMKX1ps9Lj2-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;" value="" vertex="1">
+          <mxGeometry height="230" width="430" x="260" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="tCd5-_Isohu8jhAg2T7s-9" parent="q3eSmmJyoQMKX1ps9Lj2-1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Proxmox VE" vertex="1">
+          <mxGeometry height="30" width="80" x="280" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="tCd5-_Isohu8jhAg2T7s-10" parent="q3eSmmJyoQMKX1ps9Lj2-1" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;fillColor=none;" value="" vertex="1">
+          <mxGeometry height="180" width="270" x="270" y="140" as="geometry" />
+        </mxCell>
+        <mxCell id="tCd5-_Isohu8jhAg2T7s-11" parent="q3eSmmJyoQMKX1ps9Lj2-1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Kubernetes Cluster (k3s)" vertex="1">
+          <mxGeometry height="30" width="170" x="320" y="140" as="geometry" />
+        </mxCell>
+        <mxCell id="tCd5-_Isohu8jhAg2T7s-12" parent="q3eSmmJyoQMKX1ps9Lj2-1" style="rounded=1;whiteSpace=wrap;html=1;" value="&lt;div&gt;Control plane&lt;/div&gt;&lt;font style=&quot;font-size: 8px;&quot;&gt;&lt;i&gt;API + scheduler&lt;/i&gt;&lt;/font&gt;" vertex="1">
+          <mxGeometry height="40" width="120" x="280" y="270" as="geometry" />
+        </mxCell>
+        <mxCell id="LNthd1_u3IcF7DTy4RxT-0" parent="q3eSmmJyoQMKX1ps9Lj2-1" style="rounded=1;whiteSpace=wrap;html=1;" value="&lt;div&gt;Worker 2&lt;/div&gt;&lt;div&gt;&lt;font size=&quot;1&quot;&gt;&lt;i&gt;Application pods&lt;/i&gt;&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="120" x="280" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="LNthd1_u3IcF7DTy4RxT-1" parent="q3eSmmJyoQMKX1ps9Lj2-1" style="rounded=1;whiteSpace=wrap;html=1;" value="&lt;div&gt;Worker 1&lt;/div&gt;&lt;div&gt;&lt;font size=&quot;1&quot;&gt;&lt;i&gt;Application pods&lt;/i&gt;&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="118" x="414" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="LNthd1_u3IcF7DTy4RxT-2" parent="q3eSmmJyoQMKX1ps9Lj2-1" style="rounded=1;whiteSpace=wrap;html=1;" value="&lt;div&gt;Utility VM&lt;/div&gt;&lt;div&gt;&lt;font size=&quot;1&quot;&gt;&lt;i&gt;Argo CD, Image Updater&lt;/i&gt;&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="118" x="416" y="270" as="geometry" />
+        </mxCell>
+        <mxCell id="LNthd1_u3IcF7DTy4RxT-4" edge="1" parent="q3eSmmJyoQMKX1ps9Lj2-1" source="LNthd1_u3IcF7DTy4RxT-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;labelBackgroundColor=none;textShadow=0;" value="&lt;font style=&quot;font-size: 9px;&quot;&gt;Outbound to Cloudflare&lt;/font&gt;">
+          <mxGeometry relative="1" x="0.0769" y="10" as="geometry">
+            <mxPoint as="offset" />
+            <mxPoint x="810" y="190" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="LNthd1_u3IcF7DTy4RxT-12" edge="1" parent="q3eSmmJyoQMKX1ps9Lj2-1" source="LNthd1_u3IcF7DTy4RxT-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" target="LNthd1_u3IcF7DTy4RxT-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="LNthd1_u3IcF7DTy4RxT-3" parent="q3eSmmJyoQMKX1ps9Lj2-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=default;" value="&lt;div&gt;Tunnel VM&lt;/div&gt;&lt;div&gt;&lt;font size=&quot;1&quot;&gt;&lt;i&gt;cloudflared&lt;/i&gt;&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="120" x="560" y="170" as="geometry" />
+        </mxCell>
+        <mxCell id="LNthd1_u3IcF7DTy4RxT-8" edge="1" parent="q3eSmmJyoQMKX1ps9Lj2-1" source="LNthd1_u3IcF7DTy4RxT-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="LNthd1_u3IcF7DTy4RxT-0">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="LNthd1_u3IcF7DTy4RxT-11" edge="1" parent="q3eSmmJyoQMKX1ps9Lj2-1" source="LNthd1_u3IcF7DTy4RxT-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="LNthd1_u3IcF7DTy4RxT-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="LNthd1_u3IcF7DTy4RxT-5" parent="q3eSmmJyoQMKX1ps9Lj2-1" style="rounded=1;whiteSpace=wrap;html=1;" value="&lt;font style=&quot;font-size: 11px;&quot;&gt;Traefik ingress&lt;/font&gt;" vertex="1">
+          <mxGeometry height="20" width="86" x="430" y="180" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="7ZULnDDd-qSx4u0PpDPJ" name="Page-2">
+    <mxGraphModel dx="1414" dy="783" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

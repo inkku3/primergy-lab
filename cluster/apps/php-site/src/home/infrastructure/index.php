@@ -15,6 +15,9 @@ $pageTitle = "inkku - infrastructure";
 </nav>
 
 
+  <div id="lb-back">
+    <div id="lb-img"></div>
+  </div>
 <div id="main-container">
 <div id="content">
 <div class="main-header-box">
@@ -39,7 +42,7 @@ There is a full deployment pipeline from <code>git push</code> to a live rolling
 
 <h3 class="subheading">Architecture</h3>
 The entire platform runs on a single Fujitsu Primergy RX2530 M2 server. Terraform provisions 5 VMs inside Proxmox using a Ubuntu Server cloud-init template.
-<img class="content-image" src="/infrastructure/img/arch_final.svg" id="architecture">
+<img class="zoomD" src="/infrastructure/img/arch_final.svg" id="architecture">
 Because everything runs on one physical host, this is workload distribution and fault isolation at the VM/pod level.
 As all virtual machines ultimately share the same hardware, 
 the platform provides workload isolation rather than true high availability. A hardware failure would still take down the entire environment.
@@ -59,14 +62,15 @@ the platform provides workload isolation rather than true high availability. A h
 <h3 class="subheading">Automation pipeline (GitOps loop)</h3>
 Starting with a <code>git push</code> the diagram below shows how the GitOps pipeline works. GitHub Actions builds and pushes the images which are updated to the 
 running Kubernetes application using Argo CD Image Updater.
-<img class="content-image" src="/infrastructure/img/GitOps_final.svg" id="gitops-graph">
+
+<img class="zoomD" src="/infrastructure/img/GitOps_final.svg" id="gitops-graph">
 
 Argo CD Image Updater monitors the registry for new image versions and updates the image references in the application's <code>kustomization.yaml.</code>
 This Git commit becomes the desired state that Argo CD reconciles to the Kubernetes cluster, resulting in an automated rolling update without 
 manual deployment commands.<br>
 Every deployment is traceable through Git history. This is especially important as the infrastructure has grown quite large.
 
-<img class="content-image-small" src="/infrastructure/img/request_final.svg" id="gitops-graph">
+<img class="zoomD-small" src="/infrastructure/img/request_final.svg" id="gitops-graph">
 This is how you accessed this site. Incoming requests pass through Cloudflare Tunnel to Traefik, 
 which routes traffic to the appropriate Kubernetes Service and ultimately the application Pod. 
 Cloudflare plays a major role, as there is no need to manually configure certificates, open ports, or local firewalls.
@@ -158,8 +162,39 @@ Its architecture and deployment pipeline are documented separately.
 <h4>Source code on GitHub</h4>
 <b><a href="https://github.com/inkku3/primergy-lab/tree/main">Current infrastructure</a></b><br>
 <b><a href="https://github.com/inkku3/kaatokanni400">Kaatokänni400</a></b><br>
-<b><a href="https://github.com/in-kr2/iac-proxmox-lab">IaC Bachelor's thesis</a></b>
 
 </div>
 </div>
+<script>
+// Image zooming by Molly on codepen
+var zoomImg = function() {
+    // Create evil image clone
+    var clone = this.cloneNode();
+    clone.classList.remove("zoomD");
+
+    // Put evil clone into lightbox
+    var lb = document.getElementById("lb-img");
+    lb.innerHTML = "";
+    lb.appendChild(clone);
+
+    // Show lightbox
+    lb = document.getElementById("lb-back");
+    lb.classList.add("show");
+};
+
+window.addEventListener("load", function() {
+    // Attach on click events to all .zoomD images
+    var images = document.getElementsByClassName("zoomD");
+    if (images.length > 0) {
+      for (var img of images) {
+        img.addEventListener("click", zoomImg);
+      }
+    }
+
+    // Click event to hide the lightbox
+    document.getElementById("lb-back").addEventListener("click", function() {
+      this.classList.remove("show");
+    });
+});
+</script>
 <?php include dirname($_SERVER['DOCUMENT_ROOT']) . '/footer.php'; ?>

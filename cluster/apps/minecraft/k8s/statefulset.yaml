@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: paper
+spec:
+  serviceName: paper
+  replicas: 1
+  selector:
+    matchLabels:
+      app: paper
+  template:
+    metadata:
+      labels:
+        app: paper
+    spec:
+      containers:
+        - name: minecraft
+          image: itzg/minecraft-server:latest
+          env:
+            - name: PLUGINS
+              value: "https://github.com/DiscordSRV/DiscordSRV/releases/download/v1.30.5/DiscordSRV-Build-1.30.5.jar"
+            - name: EULA
+              value: "TRUE"
+            - name: TYPE
+              value: "PAPER"
+            - name: MEMORY
+              value: "2G"
+            - name: MAX_PLAYERS
+              value: "10"
+            - name: MOTD
+              value: "Primergy Lab"
+            - name: ENABLE_RCON
+              value: "true"
+            - name: RCON_PORT
+              value: "25575"
+            - name: RCON_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: paper-rcon
+                  key: password
+
+          ports:
+            - containerPort: 25565
+              name: game
+            - containerPort: 25575
+              name: rcon
+
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            # Mount ONLY the config.yml file from the secret, leaving the rest
+            # of the plugin directory untouched on the PVC
+            - name: discordsrv-config
+              mountPath: /data/plugins/DiscordSRV/config.yml
+              subPath: config.yml
+
+          resources:
+            requests:
+              memory: "2Gi"
+              cpu: "500m"
+            limits:
+              memory: "4Gi"
+              cpu: "2000m"
+
+      # Declare the secret as a volume source
+      volumes:
+        - name: discordsrv-config
+          secret:
+            secretName: discordsrv-config
+
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: local-path
+        resources:
+          requests:
+            storage: 10Gi

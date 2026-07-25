@@ -48,10 +48,12 @@ $pageTitle = $pageTitle ?? "inkku - place";
     <div class="dropdown">
         <button class="dropbtn" onclick="toggleMobileDropdown(this)">Infrastructure</button>
             <div class="dropdown-content">
-
-                <a href="https://minecraft.inkku.xyz">Provisioning</a>
-                <a href="https://minecraft.inkku.xyz/implementation/">GitOps</a>
-                <a href="https://minecraft.inkku.xyz">Networking</a>
+                <a href="https://inkku.xyz/infrastructure">Overview</a>
+                <a href="https://inkku.xyz/infrastructure/terraform">Terraform</a>
+                <a href="https://inkku.xyz/infrastructure/ansible">Ansible</a>
+                <a href="https://inkku.xyz/infrastructure/gitops">GitOps</a>
+                <a href="https://inkku.xyz/infrastructure/kubernetes">Kubernetes</a>
+                <a href="https://inkku.xyz/infrastructure">Networking</a>
             </div>
         </div>
     
@@ -84,9 +86,13 @@ $pageTitle = $pageTitle ?? "inkku - place";
         <div class="dropdown">
         <a href="https://inkku.xyz/infrastructure" class="nav-link"><button class="dropbtn">Infrastructure</button></a>
         <div class="dropdown-content">
-                <a href="https://minecraft.inkku.xyz">Provisioning</a>
-                <a href="https://minecraft.inkku.xyz/implementation/">GitOps</a>
-                <a href="https://minecraft.inkku.xyz">Networking</a>
+                <a href="https://inkku.xyz/infrastructure">Overview</a>
+                <a href="https://inkku.xyz/infrastructure/terraform">Terraform</a>
+                <a href="https://inkku.xyz/infrastructure/ansible">Ansible</a>
+                <a href="https://inkku.xyz/infrastructure/gitops">GitOps</a>
+                <a href="https://inkku.xyz/infrastructure/kubernetes">Kubernetes</a>
+                <a href="https://inkku.xyz/infrastructure">Networking</a>
+
             </div>
     </div>
         <a href="https://inkku.xyz/projects" class="nav-link">Projects</a>

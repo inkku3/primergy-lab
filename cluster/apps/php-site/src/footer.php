@@ -2,6 +2,8 @@
     minimal HTML website served to you via PHP
   </div>
 </div>
+
+
 <script>
 function toggleMenu() {
     var nav = document.getElementById("myNav");
@@ -42,6 +44,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+
 <script src="/app.js"></script>
 </body>
 </html>
