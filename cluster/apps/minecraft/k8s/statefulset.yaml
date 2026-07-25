@@ -13,6 +13,25 @@ spec:
       labels:
         app: paper
     spec:
+      initContainers:
+        - name: inject-discord-token
+          image: busybox
+          command:
+            - sh
+            - -c
+            - |
+              if [ -f /data/plugins/DiscordSRV/config.yml ]; then
+                sed -i "s/^BotToken:.*/BotToken: \"$DISCORD_BOT_TOKEN\"/" /data/plugins/DiscordSRV/config.yml
+              fi
+          env:
+            - name: DISCORD_BOT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: discordsrv-config
+                  key: token
+          volumeMounts:
+            - name: data
+              mountPath: /data
       containers:
         - name: minecraft
           image: itzg/minecraft-server:latest
@@ -38,22 +57,14 @@ spec:
                 secretKeyRef:
                   name: paper-rcon
                   key: password
-
           ports:
             - containerPort: 25565
               name: game
             - containerPort: 25575
               name: rcon
-
           volumeMounts:
             - name: data
               mountPath: /data
-            # Mount ONLY the config.yml file from the secret, leaving the rest
-            # of the plugin directory untouched on the PVC
-            #- name: discordsrv-config
-            #  mountPath: /data/plugins/DiscordSRV/config.yml
-            #  subPath: config.yml
-
           resources:
             requests:
               memory: "2Gi"
@@ -61,13 +72,6 @@ spec:
             limits:
               memory: "4Gi"
               cpu: "2000m"
-
-      # Declare the secret as a volume source
-      #volumes:
-        #- name: discordsrv-config
-          #secret:
-            #secretName: discordsrv-config
-
   volumeClaimTemplates:
     - metadata:
         name: data
