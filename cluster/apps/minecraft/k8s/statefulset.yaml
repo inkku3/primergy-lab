@@ -50,9 +50,9 @@ spec:
               mountPath: /data
             # Mount ONLY the config.yml file from the secret, leaving the rest
             # of the plugin directory untouched on the PVC
-            - name: discordsrv-config
-              mountPath: /data/plugins/DiscordSRV/config.yml
-              subPath: config.yml
+            #- name: discordsrv-config
+            #  mountPath: /data/plugins/DiscordSRV/config.yml
+            #  subPath: config.yml
 
           resources:
             requests:
@@ -63,10 +63,10 @@ spec:
               cpu: "2000m"
 
       # Declare the secret as a volume source
-      volumes:
-        - name: discordsrv-config
-          secret:
-            secretName: discordsrv-config
+      #volumes:
+        #- name: discordsrv-config
+          #secret:
+            #secretName: discordsrv-config
 
   volumeClaimTemplates:
     - metadata:
