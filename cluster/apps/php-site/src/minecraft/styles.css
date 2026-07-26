@@ -13,8 +13,8 @@ body {
   font-family: 'Roboto Sans', sans-serif;
   overflow-y: auto;
   overflow-x: hidden;
-
 }
+
 .background-image {
   position: fixed;
   top: 0;
@@ -29,30 +29,268 @@ body {
   z-index: -1;
   transform: translateZ(0);
   background-attachment: fixed;
+}
+
+a {
+  color: #cf3c17;
+  text-decoration: none;
+  transition: color 0.1s ease-in-out;
+}
+
+a:hover {
+  color: #eb742f;
+  text-decoration: none;
+}
+/* mobile nav */
+.menu-icon {
+  display: none;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  cursor: pointer;
+  padding: 10px;
+}
+
+.menu-icon span {
+  display: block;
+  width: 30px;
+  height: 3px;
+  background-color: white;
+  margin: 6px 0;
+  transition: 0.4s;
+}
+
+.overlay-menu {
+  height: 0;
+  width: 100%;
+  position: fixed;
+  z-index: 999;
+  left: 0;
+  top: 0;
+  background-color: rgba(0, 0, 0, 0.95);
+  overflow-y: hidden;
+  transition: height 0.5s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.overlay-menu.open {
+  height: 100%;
+  opacity: 1;
+  pointer-events: all;
+  transition: height 0.6s ease, opacity 0.3s ease;
+  overflow-y: auto;
+
+}
+
+.overlay-content {
+  position: relative;
+  width: 100%;
+  text-align: center;
+  margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 0 20px;
+  overflow-y: auto;
+
+}
+
+.overlay-content .nav-link,
+.overlay-content .dropbtn {
+  padding: 15px;
+  font-size: 1.5em;
+  display: block;
+  width: 80%;
+  margin: 0 auto;
+  background-color: transparent;
+  color: white;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.overlay-content .dropdown-content {
+  position: static;
+  background-color: transparent;
+  box-shadow: none;
+  display: block;
+  transform: none;
+  left: 0;
+  margin-top: 0;
+  max-height: 0;
+  overflow: auto;
+  transition: max-height 0.5s ease, margin-top 0.5s ease;
+}
+
+.overlay-content .dropdown-content.open {
+  max-height: 260px;
+  margin-top: 10px;
+
+}
+
+.overlay-content .dropdown-content a {
+  font-size: 1.2em;
+  padding: 10px;
+  color: white;
+  text-decoration: none;
+  display: block;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  transition-delay: 0s;
+}
+
+.overlay-content .dropdown-content.open a {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.overlay-content .dropdown-content.open a:nth-child(1) {
+  transition-delay: 0.1s;
+}
+
+.overlay-content .dropdown-content.open a:nth-child(2) {
+  transition-delay: 0.2s;
+}
+
+
+
+/* --- Documentation Sidebar (Full Vertical Column) --- */
+.sidebar-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 240px;
+  height: 100vh; /* Stretches the full height of the screen */
+  background-color: rgba(0, 0, 0, 0.4); /* The slight dark tint */
+  backdrop-filter: blur(5px);
+  border-right: 1px solid rgba(223, 109, 43, 0.2);
+  padding: 120px 20px 20px 30px; /* Pushes links down so top-nav has room */
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  transition: transform 0.3s ease;
+}
+
+.sidebar-title {
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #eb742f;
+  margin-bottom: 15px;
+  padding-left: 10px;
+}
+
+.sidebar-link {
+  color: #cccccc;
+  font-size: 0.95rem;
+  text-decoration: none;
+  padding: 8px 12px;
+  border-radius: 0 4px 4px 0;
+  border-left: 2px solid rgba(223, 109, 43, 0.2); /* Unfocused line */
+  transition: all 0.2s ease;
+}
+
+.sidebar-link:hover {
+  color: #ffffff;
+  background-color: rgba(223, 109, 43, 0.15);
+  border-left-color: #eb742f; /* Orange line on hover */
+  padding-left: 16px; /* Subtle shift to the right */
+}
+
+.sidebar-link.active {
+  color: #ffffff;
+  font-weight: 700;
+  border-left-color: #eb742f;
+  background-color: rgba(223, 109, 43, 0.25);
+}
+
+/* --- Mobile Drawer & Toggle Button --- */
+.sidebar-toggle-btn {
+  display: none; 
+  position: fixed;
+  bottom: 25px;
+  left: 20px;
+  z-index: 90;
+  background: rgba(15, 15, 15, 0.85);
+  color: #fff;
+  border: 1px solid #eb742f;
+  padding: 10px 18px;
+  border-radius: 25px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(6px);
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.sidebar-toggle-btn:hover {
+  background: rgba(223, 109, 43, 0.85);
+  transform: translateY(-2px);
+}
+
+.sidebar-backdrop {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(3px);
+  z-index: 45;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.sidebar-backdrop.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Mobile & Narrow Screen Responsive Mode */
+@media (max-width: 1250px) {
+  .sidebar-nav {
+  display: none;
+  }
+
 
 }
 
 #main-container {
-display: flex;
-flex-direction: column;
-min-height: 100vh;
-box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  box-sizing: border-box;
 }
 
 #top-navigation {
-width: 100%;
-padding: 30px 0 0px;
-box-sizing: border-box;
+  width: 100%;
+  padding: 30px 0 0px;
+  box-sizing: border-box;
 }
 
 #links-container {
-display: flex;
-justify-content: center;
-align-items: center;
-gap: 15px;
-width: 100%;
-box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  width: 100%;
+  box-sizing: border-box;
 }
+
 .nav-link {
   color: white;
   font-weight: 700;
@@ -62,21 +300,22 @@ box-sizing: border-box;
   transition: background-color 0.5s ease;
   display: inline-block;
 }
+
 .nav-link:hover {
   background-color: rgba(0, 0, 0, 0.6);
 }
 
 #content {
-display: flex;
-flex-direction: column;
-align-items: center;
-justify-content: center;
-justify-content: flex-start;
-align-items: center;
-padding: 50px 20px;
-box-sizing: border-box;
-flex: 1;
-width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 50px 20px;
+  box-sizing: border-box;
+  flex: 1;
+  width: 100%;
 }
 
 .dropdown {
@@ -107,7 +346,6 @@ width: 100%;
   text-align: center;
   transition: background-color 0.3s ease;
   text-decoration: none;
-
 }
 
 .dropdown-content a:hover {
@@ -144,35 +382,37 @@ width: 100%;
 }
 
 .dropbtn:hover {
+  color: #eb742f; 
   background-color: rgba(0, 0, 0, 0.6);
 }
+
 .overlay-menu {
   height: 0;
   transition: height 0.5s;
 }
+
 .overlay-menu.open {
   height: 100%;
 }
 
-
 #bottom-header {
-background-color: rgba(0, 0, 0, 0.4);
-text-align: center;
-font-size: 0.9em;
-z-index: 10;
-width: 100%;
-color: white;
-position: relative;
+  background-color: rgba(0, 0, 0, 0.4);
+  text-align: center;
+  font-size: 0.9em;
+  z-index: 10;
+  width: 100%;
+  color: white;
+  position: relative;
 }
 
 #particles-js {
-position: fixed;
-width: 100%;
-height: 100%;
-top: 0;
-left: 0;
-z-index: -1;
-pointer-events: none;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  pointer-events: none;
 }
 
 .main-header-box, .site-content-box {
@@ -198,13 +438,16 @@ pointer-events: none;
   background-color: rgba(0, 0, 0, 0.3);
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
   font-size: 1.0rem;
-  line-height: 1.7;
+  line-height: 1.5;
   margin-bottom: 250px;
 }
+
 .infostack{
   margin-left: 10px;
-  font-size: 1.0rem;
+  font-size: 0.95rem;
+  line-height: 1.6;
 }
+
 /* For portfolio page */
 .project-section {
   display: flex;
@@ -273,8 +516,8 @@ pointer-events: none;
 .portfolio-link:hover {
   color: white;
   background-color: #512c1b28;
-
 }
+
 .mini-link {
   display: flex;
   justify-content: flex-end;
@@ -297,65 +540,75 @@ pointer-events: none;
   color: white;
   background-color: rgba(255, 110, 16, 0.2);
 }
-/* For the minecraft page */
 
+/* For the minecraft page */
 .server-container{
   display: flex;
   align-items: center;
-  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 25px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  position: relative;
 }
+
 .playercounter{
   font-weight: 700;
   font-family: monospace;
   margin-right: 30px;
   margin-left: 10px;
 }
+
 .mcbox {
   color: white;
   font-family: monospace;
   font-size: 3em;
   font-weight: 700;
   margin-top: 100px;
-
 }
 
 .header-box {
   background-color: rgba(0, 0, 0, 0.6);
   color: white;
   font-family: monospace;
-  font-size: 1.2em;
+  font-size: 1.3em;
   font-weight: 600;
-  padding: 15px 20px;
+  padding: 14px 20px;
   border-radius: 8px;
-  margin-top: 20px;
-  margin-bottom: 15px;
+  margin: 0;
   display: inline-block;
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
 }
+
 .copied-message {
   display: none;
   opacity: 0;
   color: white;
   font-family: monospace;
   font-weight: 500;
-  font-size: 0.8em;
+  font-size: 0.85em;
   position: absolute;
-  margin-left: 430px; 
-  margin-top: 90px; 
-  transition: opacity 0.3s ease; 
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 10px;
+  white-space: nowrap;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
 }
+
 .copy-ip-button {
   font-family: monospace;
   background-color: rgba(219, 66, 46, 0.8);
   color: white;
-  font-size: 1.2em;
+  font-size: 1.1em;
   font-weight: 600;
-  padding: 8px 20px;
+  padding: 12px 22px;
   border: none;
   border-radius: 7px;
   cursor: pointer;
   transition: background-color 0.3s ease;
-
 }
 
 .copy-ip-button:hover {
@@ -399,6 +652,7 @@ pointer-events: none;
   transition: filter 0.2s ease;
   overflow: hidden;
 }
+
 .thumbnail:hover {
   filter: brightness(50%)
 }
@@ -416,6 +670,7 @@ pointer-events: none;
   justify-content: center;
   align-items: center;
 }
+
 .gallery-inside {
   position: relative;
   z-index: 12; 
@@ -429,6 +684,7 @@ pointer-events: none;
   margin-bottom: 30px;
   gap: 30px;
 }
+
 .gallery-img {
   margin-left: 20px;
   max-width: 50%;
@@ -436,12 +692,14 @@ pointer-events: none;
   height: auto;
   object-fit: contain;
 }
+
 .gallery-text{
   color: white;
   width: 40%;
   text-align: left;
   word-wrap: break-word;
 }
+
 .gallery-nav {
   font-size: larger;
   color: white;
@@ -452,30 +710,130 @@ pointer-events: none;
   color: #f1f1f1;
   transition: 0.3s;
 }
+
 .gallery-inside, .gallery-text, .gallery-nav{
   animation-name: zoom;
   animation-duration: 0.6s;
 }
+
+
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: 2px solid #00000000;
+  text-align: left;
+  padding: 9px;
+}
+
+tr:nth-child(even) {
+  background-color: #0000001e;
+}
+
+
+/* REFERENCE:
+https://code-boxx.com/image-zoom-css-javascript/
+METHOD 3 ZOOM ON CLICK (LIGHTBOX) */
+  /* IMAGE */
+  .zoomD {
+    width: 300px;
+    height: auto;
+  /* ease | ease-in | ease-out | linear */
+    transition: all ease-in-out 0.4s;
+    cursor: zoom-in;
+  display: block !important;
+  width: 100% !important;
+  max-width: 1000px;
+  height: auto;
+  margin: 20px auto !important;
+  border-radius: 8px;
+}
+
+.zoomD-small {
+  display: block !important;
+  width: 100% !important;
+  max-width: 500px;
+  height: auto;
+  margin: 20px auto !important;
+  border-radius: 8px;
+}
+
+  /* LIGHTBOX BACKGROUND */
+  #lb-back {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 999;
+    visibility: hidden;
+    opacity: 0;
+    transition: all ease-in-out 0.4s;
+    backdrop-filter: blur(1px);
+    -webkit-backdrop-filter: blur(1px); /* Required for Safari support */
+  
+    /* ease | ease-in | ease-out | linear
+ transition: transform ease-in-out 0.5s; */
+  }
+  #lb-back.show {
+    visibility: visible;
+    opacity: 1;
+  }
+  /* LIGHTBOX IMAGE */
+  #lb-img {
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+    text-align: center;
+  }
+  #lb-img img {
+    /* FULL WIDTH IMAGE
+    width: 100%;
+    height: auto;
+    cursor: zoom-out; 
+    */
+
+    /* MAX WIDTH 1200px IMAGE */
+    width: 100%;
+    max-width: 1000px;
+    height: auto;
+    margin: 0 auto;
+    cursor: zoom-out;
+  }
+
 @keyframes zoom {
   from {transform: scale(0.1)} 
   to {transform: scale(1)}
 }
 
 @media (max-width: 768px) {
+  /* Hide sidebar on mobile to prevent blocking content */
+  #sidebar {
+    display: none;
+  }
+
   .main-header-box, 
-  .site-content-box,
   .thumbnail-container {
     width: 95%;
     padding: 10px;
   }
 
   .site-content-box {
-    padding: 40px 0;
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+    border-radius: 0;
+    padding: 40px 28px;
     font-size: 1.0rem;
+    box-sizing: border-box;
   }
 
   #content {
-    padding: 30px 25px;
+    padding: 30px 0;
     justify-content: center; 
   }
 
@@ -518,27 +876,50 @@ pointer-events: none;
   .menu-icon.change .bar3 {
     transform: rotate(45deg) translate(-8px, -6px);
   }
+  #links-container {
+  display: none;
+  }
 
-  /* MC SERVER */
+  .menu-icon {
+    display: block;
+  }
+
+  .menu-icon.change .bar1 {
+    transform: rotate(-45deg) translate(-8px, 6px);
+  }
+
+  .menu-icon.change .bar2 {
+    opacity: 0;
+  }
+
+  .menu-icon.change .bar3 {
+    transform: rotate(45deg) translate(-8px, -6px);
+  }
+
+  /* MC SERVER (mobile) */
   .header-box {
-    font-size: 1em;
-    padding: 12px 15px;
-    max-width: 90%; 
+    font-size: 1.05em;
+    padding: 12px 14px;
+    max-width: none;
     overflow-x: auto;
-    margin: 0 auto;
+    margin: 0;
   }
 
   .copy-ip-button {
-    font-size: 1em;
-    padding: 8px 15px;
-    margin: 0 auto; 
+    font-size: 1.05em;
+    padding: 12px 16px;
+    margin: 0; 
   }
 
   .server-container {
     padding: 0 10px;
-    gap: 15px; 
-    flex-direction: column; 
+    gap: 10px; 
+    flex-direction: row; 
+    flex-wrap: nowrap;
     align-items: center; 
+    justify-content: center;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   .playercounter {
@@ -547,10 +928,10 @@ pointer-events: none;
   }
 
   .copied-message { 
-    position: static;
-    margin: 5px 0 0;
+    font-size: 0.75em;
+    white-space: normal;
+    max-width: 90%;
     text-align: center;
-    width: 100%;
   }
 
   .background-image {
@@ -567,9 +948,11 @@ pointer-events: none;
   .project-section h3 {
     margin: 0 0 10px;
   }
+  
   .project-text{
     font-size: 0.9rem;
   }
+  
   .project-content {
     gap: 20px;
   }
@@ -579,11 +962,11 @@ pointer-events: none;
     height: 80px;
     margin-left: -25px;
   }
+  
   .mini-link{
     margin-right: 10px;
     padding: 1px 10px;
     font-size: smaller;
-
   }
 
   /* Gallery & Portfolio */
@@ -628,5 +1011,14 @@ pointer-events: none;
     z-index: 15;
     padding: 10px;
     cursor: pointer;
+  }
+  
+  .content-image {
+    display: block !important;
+    width: 100% !important;
+    max-width: 600px;
+    height: auto;
+    margin: 20px auto !important;
+    border-radius: 8px;
   }
 }

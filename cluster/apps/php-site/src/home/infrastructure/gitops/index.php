@@ -99,7 +99,7 @@ In the future there are plans to add ansible lint and terraform fmt to the CI st
 
 <br>
 
-<h4>Source code on <a href="https://github.com/inkku3/primergy-lab/tree/main/terraform">GitHub</a>.</h4>
+<h4>Source code on <a href="https://github.com/inkku3/primergy-lab/">GitHub</a>.</h4>
 
 
 </div>

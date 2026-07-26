@@ -548,13 +548,6 @@ a:hover {
   gap: 20px;
 }
 
-.playercounter{
-  font-weight: 700;
-  font-family: monospace;
-  margin-right: 30px;
-  margin-left: 10px;
-}
-
 .mcbox {
   color: white;
   font-family: monospace;

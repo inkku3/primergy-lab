@@ -113,7 +113,7 @@ All of this is pulled from <code>vars/secrets.yml</code>, kept out of the rest o
 
 Future plans include incorporating Ansible vault.
 
-<h4>Source code on <a href="https://github.com/inkku3/primergy-lab/tree/main/terraform">GitHub</a>.</h4>
+<h4>Source code on <a href="https://github.com/inkku3/primergy-lab/">GitHub</a>.</h4>
 
 
 </div>

@@ -146,7 +146,7 @@ WAF features allow region blocking. Currently only traffic from Finland and Swed
   <tr>
     <td>Minecraft server</td>
     <td>Kubernetes</td>
-    <td>Planned</td>
+    <td style="color:#30D900">Live &#10004;</td>
   </tr>
   <tr>
     <td>Monitoring</td>

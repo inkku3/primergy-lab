@@ -117,7 +117,7 @@ backend: { service: { name: nginx-service, port: 80 } }</code></pre>
 
 
 
-<h4>Source code on <a href="https://github.com/inkku3/primergy-lab/tree/main/terraform">GitHub</a>.</h4>
+<h4>Source code on <a href="https://github.com/inkku3/primergy-lab/">GitHub</a>.</h4>
 
 
 </div>
