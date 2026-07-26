@@ -40,7 +40,7 @@ $pageTitle = $pageTitle ?? "inkku - place";
             <div class="dropdown-content">
                 <a href="https://minecraft.inkku.xyz">Server</a>
                 <a href="https://minecraft.inkku.xyz/implementation/">Info</a>
-                <a href="https://minecraft.inkku.xyz">Live Map (TBD)</a>
+                <a href="https://map.inkku.xyz">Live Map</a>
 
 
             </div>
@@ -78,7 +78,7 @@ $pageTitle = $pageTitle ?? "inkku - place";
             <div class="dropdown-content">
                 <a href="https://minecraft.inkku.xyz">Server</a>
                 <a href="https://minecraft.inkku.xyz/implementation/">Info</a>
-                <a href="https://minecraft.inkku.xyz">Live Map (TBD)</a>
+                <a href="https://map.inkku.xyz">Live Map</a>
 
 
             </div>
