@@ -26,3 +26,13 @@ spec:
                 name: nginx-service
                 port:
                   number: 80
+    - host: map.inkku.xyz
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: squaremap
+                port:
+                  number: 8080

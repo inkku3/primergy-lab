@@ -41,7 +41,7 @@ There is a full deployment pipeline from <code>git push</code> to a live rolling
 </div>
 
 <h3 class="subheading">Architecture</h3>
-The entire platform runs on a single Fujitsu Primergy RX2530 M2 server. Terraform provisions 5 VMs inside Proxmox using a Ubuntu Server cloud-init template.
+The entire platform runs on a single enterprise-grade Fujitsu Primergy RX2530 M2 rack server. Terraform provisions 5 VMs inside Proxmox using a Ubuntu Server cloud-init template.
 <img class="zoomD" src="/infrastructure/img/arch_final.svg" id="architecture">
 Because everything runs on one physical host, this is workload distribution and fault isolation at the VM/pod level.
 As all virtual machines ultimately share the same hardware, 
