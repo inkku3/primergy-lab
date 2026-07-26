@@ -1,0 +1,18 @@
+# k8s/ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: squaremap-ingress
+  namespace: minecraft
+spec:
+  rules:
+    - host: map.inkku.xyz
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: squaremap
+                port:
+                  number: 8080
