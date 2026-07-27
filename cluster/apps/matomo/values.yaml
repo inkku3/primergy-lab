@@ -1,0 +1,25 @@
+db:
+  hostname: matomo-mariadb.matomo.svc.cluster.local
+  port: 3306
+  name: matomo
+  username: matomo
+  password:
+    secretKeyRef:
+      name: matomo-db
+      key: password
+
+matomo:
+  ingress:
+    enabled: true
+
+  dashboard:
+    hostname: matomo.inkku.xyz
+    ingressClassName: traefik
+    firstuser:
+      username: admin
+      password: "bootstrapPASSWORD"
+      email: inkku2@proton.me
+
+  tracker:
+    hostname: track.inkku.xyz
+    ingressClassName: traefik

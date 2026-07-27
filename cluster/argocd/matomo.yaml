@@ -1,0 +1,31 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: matomo
+  namespace: argocd
+spec:
+  project: default
+  sources:
+    - repoURL: https://digitalist-se.github.io/matomo-kubernetes
+      chart: matomo
+      targetRevision: "11.0.56"
+      helm:
+        valueFiles:
+          - $values/cluster/apps/matomo/values.yaml
+
+    - repoURL: https://github.com/inkku3/primergy-lab.git
+      targetRevision: main
+      ref: values
+
+    - repoURL: https://github.com/inkku3/primergy-lab.git
+      targetRevision: main
+      path: cluster/apps/matomo
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: matomo
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
