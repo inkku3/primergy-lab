@@ -39,12 +39,12 @@ spec:
               mountPath: /var/lib/mysql
           livenessProbe:
             exec:
-              command: ["mysqladmin", "ping", "-h", "localhost"]
+              command: ["mariadb-admin", "ping", "-h", "localhost"]
             initialDelaySeconds: 30
             periodSeconds: 10
           readinessProbe:
             exec:
-              command: ["mysqladmin", "ping", "-h", "localhost"]
+              command: ["mariadb-admin", "ping", "-h", "localhost"]
             initialDelaySeconds: 5
             periodSeconds: 5
           resources:
