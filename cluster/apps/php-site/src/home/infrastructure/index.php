@@ -149,6 +149,11 @@ WAF features allow region blocking. Currently only traffic from Finland and Swed
     <td style="color:#30D900">Live &#10004;</td>
   </tr>
   <tr>
+    <td>Matomo analytics</td>
+    <td>Kubernetes</td>
+    <td style="color:#30D900">Live &#10004;</td>
+  </tr>
+  <tr>
     <td>Monitoring</td>
     <td>To be planned</td>
     <td>Planned</td>
