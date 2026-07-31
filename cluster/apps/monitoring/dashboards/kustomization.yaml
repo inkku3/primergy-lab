@@ -13,6 +13,13 @@ configMapGenerator:
     options:
       labels:
         grafana_dashboard: "1"
+  - name: dashboard-argocd-overview
+    files:
+      - argocd-overview.json
+    options:
+      labels:
+        grafana_dashboard: "1"
+
   #- name: dashboard-homelab-overview
   #  files:
   #    - homelab-overview.json
