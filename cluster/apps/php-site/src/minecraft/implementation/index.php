@@ -14,22 +14,22 @@ This project demonstrates operating a stateful application on my self-hosted Kub
 The server runs PaperMC and is deployed entirely from declarative Kubernetes manifests stored in Git and synchronised automatically by ArgoCD.
 
 The project showcases persistent storage management, secret handling, networking, ingress configuration, 
-and deployment automation within a production-like homelab environment.
+and deployment automation within a homelab environment.
 
-Scoped for a small private server (≤10 concurrent players, single node), 
-which informed decisions to avoid unnecessary complexity, e.g. a single-replica StatefulSet rather 
-than a multi-node game server orchestration layer, and NodePort/LoadBalancer exposure rather than a dedicated ingress-adjacent proxy.
+The deployment is intentionally scoped for a small private server (max 10 concurrent players on a single-node cluster), 
+which informed several design decisions. These include using a single-replica StatefulSet rather than a multi-node game server orchestration platform, 
+and exposing the game server through a LoadBalancer Service instead of introducing additional proxy layers.
 
 <div class="infostack">
 <h4>Architecture</h4>
 The deployment consists of:
 <ul>
-<li>Kubernetes StatefulSet for the PaperMC server</li>
+<li>Kubernetes StatefulSet providing stable pod identity and persistent storage for the PaperMC server</li>
 <li>PersistentVolumeClaim for world and plugin data</li>
-<li>LoadBalancer Service exposing Minecraft and RCON</li>
-<li>Dedicated Traefik Ingress exposing the SquareMap web interface</li>
-<li>Cloudflare Tunnel publishing the live map on its own subdomain</li>
-<li>Kubernetes Secrets for sensitive configuration</li>
+<li>Kubernetes LoadBalancer Service exposing Minecraft and RCON</li>
+<li>Traefik Ingress exposing the SquareMap web interface</li>
+<li>Cloudflare Tunnel publishing SquareMap on a dedicated subdomainn</li>
+<li>Kubernetes Secrets storing sensitive configuration such as RCON credentials and the DiscordSRV bot token</li>
 <li>PaperMC running from the <a href="https://github.com/itzg/docker-minecraft-server"><code>itzg/minecraft-server</code></a> container image</li>
 </ul>
 </div>
@@ -55,11 +55,14 @@ The deployment exposes two separate services:<br>
 <br>
 <b>Minecraft Server</b>
 <ul>
-<li>Kubernetes LoadBalancer Service</li>
+<li>Exposed through a Kubernetes LoadBalancer Service provided by k3s ServiceLB</li>
 <li>TCP connectivity for Minecraft clients</li>
+<li>Router port forwarding directs external traffic to the LoadBalancer Service</li>
 <li>RCON available for local administration</li>
-<li>DiscordSRV for remote administration</li>
+<li>DiscordSRV provides integration between the game server and Discord for remote administration</li>
 </ul>
+To reduce automated scan traffic and log noise, the server listens on a non-default port. 
+A DNS SRV record allows players to connect using a standard hostname without specifying the port.
 <b>SquareMap</b>
 <ul>
 <li>Published through a dedicated Traefik Ingress</li>
@@ -68,20 +71,27 @@ The deployment exposes two separate services:<br>
 </ul>
 
 <h4 class="subheading">Security</h4>
-Sensitive values, including the DiscordSRV bot token and RCON credentials, are stored as Kubernetes Secrets rather than in version-controlled manifests.
+Sensitive configuration, including RCON credentials and the DiscordSRV bot token, is stored as Kubernetes Secrets rather than in version-controlled manifests.
 
-The SquareMap web interface is published through Cloudflare Tunnel, avoiding direct exposure of the web service to the internet.
+DiscordSRV manages its own configuration file, so instead of replacing the file with a Secret mount, an 
+initContainer injects only the bot token into the plugin's generated configuration during startup. 
+This preserves the plugin's ability to manage its own configuration while keeping credentials outside version control.
+<br><br>
+The SquareMap web interface is published through a Cloudflare Tunnel, preventing direct public exposure of the service. 
+Only the Minecraft game port is directly exposed to the internet.
 
 <h3 class="subheading">Design Decisions</h3>
-Several implementation choices were made based on the requirements of the Minecraft protocol rather than forcing every service through the same architecture.
-
-Because Minecraft requires direct TCP connectivity, the game server is exposed through a dedicated router port forward to a Kubernetes LoadBalancer Service. 
-<br><br>In contrast, HTTP services such as SquareMap are published through Traefik and Cloudflare Tunnel.
-
-The server also listens on a non-default port to reduce unsolicited connection attempts, 
-with DNS SRV records providing a transparent connection experience for players.
-
-Future improvements include backups.
+Several implementation choices were driven by the differing requirements of the services being hosted. 
+Because Minecraft requires direct TCP connectivity, the game server is exposed through a router port forward to a Kubernetes LoadBalancer Service. 
+On this single-node k3s cluster, the built-in ServiceLB provides external connectivity without requiring MetalLB or additional load balancing components.
+<br><br>
+HTTP services, such as SquareMap, are instead published through Traefik and Cloudflare Tunnel, avoiding direct exposure while benefiting from standard HTTP routing.
+<br><br>
+The deployment also balances declarative infrastructure with mutable application state. An initial player whitelist is seeded from a Git-managed Secret during 
+deployment, providing a reproducible baseline for disaster recovery. Subsequent whitelist changes are performed through DiscordSRV or RCON and are preserved across 
+pod restarts rather than being overwritten by Git reconciliation.
+<br><br>
+Future improvements include automated backups of persistent world data and plugin configuration
 <h4>Source code on <a href="https://github.com/inkku3/primergy-lab/">GitHub</a>.</h4>
 
 </div>
