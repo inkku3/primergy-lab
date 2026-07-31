@@ -12,6 +12,7 @@ $pageTitle = "inkku - infrastructure/terraform";
     <a href="/infrastructure/gitops" class="sidebar-link">GitOps pipeline</a>
     <a href="/infrastructure/kubernetes" class="sidebar-link">Kubernetes</a>
     <a href="/infrastructure/networking" class="sidebar-link">Networking</a>
+    <a href="/infrastructure/monitoring" class="sidebar-link">Monitoring & Observability</a>
 </nav>
 
 
@@ -24,8 +25,8 @@ $pageTitle = "inkku - infrastructure/terraform";
 
 <h3 class="subheading">Summary</h3>
 Terraform provisions the 5 VMs that make up the platform inside Proxmox, cloning each from a shared template and sizing it for its specific role.
-This is the first stage of the pipeline: everything downstream (Ansible, k3s, ArgoCD) assumes these VMs already exist, are reachable, and are correctly sized.
-Terraform's job stops at an existing bootable VM that is reachable by SSH. It does not configure anything inside the VM.
+This is the first stage of the pipeline. Everything downstream (Ansible, k3s, ArgoCD) assumes these VMs already exist, are reachable, and are correctly sized.
+Terraform's job stops at an existing bootable VM that is reachable by SSH. It does not configure anything inside the OS.
 
 <div class="infostack">
 <h4>What Terraform owns here:</h4>
@@ -33,8 +34,8 @@ Terraform's job stops at an existing bootable VM that is reachable by SSH. It do
 <li>Provider connection to Proxmox (<code>bpg/proxmox</code>, via API endpoint + token auth)</li>
 <li>VM definitions for each named role driven by a single <code>vms</code> map variable</li>
 <li>Per-role sizing: cores, memory, and disk scaled to what each role actually needs</li>
-<li>Cloud-init injection for the <code>ansible</code> user, SSH key, and static IP per VM</li>
-<li>Generating the Ansible inventory file from the resulting VM IPs</li>
+<li>Cloud-init injection for the <code>ansible</code> user, SSH key, and static IPs</li>
+<li>Dynamically generating the Ansible inventory file from the resulting VM IPs</li>
 </ul>
 </div>
 
@@ -87,7 +88,12 @@ The cloudflared tunnel VM does one job and gets exactly the resources that job n
 </table>
 <br>
 The two workers carry the real compute budget of the host, leaving the control-plane and utility VMs lean since they don't run application workloads directly.
-
+Because this entire platform runs on a host with a hard 120GB SSD limit, capacity planning had to be exact. 
+The two worker nodes carry the real compute and storage budget for application workloads. 
+The control-plane and utility VMs are kept extremely lean since they don't run application pods.
+<br><br>
+This specific configuration allocates exactly 114GB of the 120GB available, 
+leaving a 6GB safety margin for Proxmox OS overhead and LVM metadata. There is zero room for over-provisioning or wasted capacity.
 <h3 class="subheading">Provisioning flow</h3>
 A single <code>terraform apply</code> loops over the <code>vms</code> map with <code>for_each</code>, 
 cloning every VM from the same template but applying each role's own cores/memory/disk/IP. Adding a node is a one-line map entry.
@@ -158,7 +164,8 @@ cloning every VM from the same template but applying each role's own cores/memor
 </div>
 
 <h3 class="subheading">Handoff to Ansible</h3>
-The most important part of this stage isn't the VMs themselves — it's the handoff. Once VMs exist, <code>ansible_inventory.tf</code> pulls the IPs straight out of the same <code>vms</code> map and renders <code>inventory.tftpl</code> into a real Ansible inventory at <code>ansible/inventory.ini</code>. No IP is ever typed twice.
+Once VMs exist, <code>ansible_inventory.tf</code> pulls the IPs straight out of the same <code>vms</code> map and renders <code>inventory.tftpl</code> 
+into a real Ansible inventory at <code>ansible/inventory.ini</code>. I use Terraform's templatefile function (.tftpl).
 
 <div class="infostack">
 <h4>Generated inventory groups</h4>
@@ -185,7 +192,7 @@ Terraform never touches the OS beyond cloud-init and the initial SSH user, and A
 The <code>k3s_cluster:children</code> group is what lets the Ansible playbook target the whole cluster without hardcoding which node is which.
 
 <div class="infostack">
-<h4>Why split this way:</h4>
+<h4>Why split it this way:</h4>
 <ul>
 <li>Re-running <code>terraform apply</code> won't reconfigure a VM's software, and re-running the Ansible playbook won't recreate VMs</li>
 <li>Infrastructure changes (resize a worker, add a node) and configuration changes (bump the k3s version) can be reasoned about and version controlled independently</li>

@@ -12,6 +12,7 @@ $pageTitle = "inkku - infrastructure/kubernetes";
     <a href="/infrastructure/gitops" class="sidebar-link">GitOps pipeline</a>
     <a href="/infrastructure/kubernetes" class="sidebar-link active">Kubernetes</a>
     <a href="/infrastructure/networking" class="sidebar-link">Networking</a>
+    <a href="/infrastructure/monitoring" class="sidebar-link">Monitoring & Observability</a>
 </nav>
 
 
@@ -23,15 +24,24 @@ $pageTitle = "inkku - infrastructure/kubernetes";
 <div class="site-content-box">
 <h3 class="subheading">Summary</h3>
 The cluster runs as k3s (server + 2 workers), with all application workloads living in the <code>apps</code> namespace.
- Every manifest on this page is applied by Argo CD, driven by the GitOps loop.
-This page focuses on <code>php-site</code>, the one application fully deployed on Kubernetes today, 
-as a worked example of how a real workload is structured here.
+Every manifest on this page is applied by Argo CD, driven by the GitOps loop.
+While the cluster hosts a full observability stack, analytics, and stateful game servers, this page uses <code>php-site</code> as an architectural case study for 
+stateless web services demonstrating container decoupling, FastCGI routing, and hybrid-cloud egress proxying.
 
-
+<h3>Workload Design (StatefulSets vs. Deployments)</h3>
+A common anti-pattern in homelabs is treating every workload as a generic Deployment. 
+In this cluster, workload primitives are chosen based on state boundaries and identity requirements:
+<ul>
+  <li><b>Stateless Deployments (php-site, Grafana)</b> - Used where pod instances are completely disposable and hold no unique local data. 
+  Scaling or replacing a pod carries zero risk of data loss.</li>
+  <li><b>StatefulSets (PaperMC Minecraft, MariaDB)</b> - Reserved for workloads requiring stable network identifiers and persistent storage bindings (PersistentVolumeClaims). 
+  PaperMC requires deterministic disk writes for world files, and MariaDB requires strict volume binding to prevent database corruption on pod rescheduling.</li>
+</ul>
 <h3 class="subheading">Why two Deployments</h3>
 <code>php-site</code> is split into a <code>php-deployment</code> (PHP-FPM) and an <code>nginx-deployment</code>, each with its own Service. 
 nginx serves static content, routes PHP requests to <code>php-service:9000</code> over FastCGI, 
 and proxies one specific path to an entirely separate hosting platform.
+
 
 <div class="infostack">
 <h4>php-deployment.yaml</h4>
@@ -48,8 +58,9 @@ ports:
 - containerPort: 9000</code></pre>
 </div>
 
-Splitting these means the two images built by GitHub Actions (<code>primergy-lab-php</code>, <code>primergy-lab-nginx</code>) 
-map directly onto two independent Deployments. A new PHP image rolls out without touching the nginx pod, and vice versa.
+Decoupling nginx and PHP-FPM into separate Deployments (rather than a single multi-container pod) allows independent scaling and image rollouts. 
+A frontend CSS/template change built by GitHub Actions updates the nginx Deployment instantly without terminating or interrupting running PHP process workers.
+
 
 <h3 class="subheading">nginx config</h3>
 <code>home.conf</code> handles the <code>inkku.xyz</code> virtual host, and it's doing more than serving PHP. 
@@ -78,17 +89,19 @@ location ~ \.php$ {
 </ul>
 
 This is the actual mechanism behind running one workload on Azure App Service while it still appears to live under <code>inkku.xyz</code><br>
-From a visitor's perspective there's one site. Underneath, nginx is quietly bridging a k3s cluster on a home server to a PaaS service in Sweden Central. 
+From a visitor's perspective there's one site.
+Under the hood, nginx routes standard traffic to local K3s pods while silently reverse-proxying <code>/projects/kaatokanni400/</code>
+to an external Azure App Service instance in Sweden, rewriting Host and X-Forwarded-Proto headers on the fly.
 <code>minecraft.conf</code> handles the second vhost (<code>minecraft.inkku.xyz</code>) separately.
 
 <h3 class="subheading">Service layer</h3>
 Both Deployments get a matching <code>ClusterIP</code> Service, keyed to their pod labels. 
-Neither Service is reachable from outside the cluster on its own as the Ingress handles that. For the Azure path, Nginx itself is the egress point.
+Neither Service is reachable from outside the cluster on its own as the Ingress handles that. For the Azure path, nginx itself is the egress point.
 
 
 <h3 class="subheading">Ingress</h3>
-A single Ingress resource routes both <code>inkku.xyz</code> and <code>minecraft.inkku.xyz</code> to the same <code>nginx-service</code>
-. This is host-based routing, not path-based. nginx itself decides what to serve based on the <code>Host</code> header and, 
+A single Ingress resource routes both <code>inkku.xyz</code> and <code>minecraft.inkku.xyz</code> to the same <code>nginx-service</code>.
+ This is host-based routing, not path-based. nginx itself decides what to serve based on the <code>Host</code> header and, 
 within <code>inkku.xyz</code>, the request path.
 
 <div class="infostack">
@@ -106,13 +119,17 @@ paths:
 backend: { service: { name: nginx-service, port: 80 } }</code></pre>
 </div>
 
-<h3 class="subheading">Room for improvement</h3>
+<h3 class="subheading">Hardening & Operational Realities</h3>
+Running workloads on a single physical host with strict resource constraints (120GB SSD, shared RAM) highlighted several operational realities.
 <div class="infostack">
 <ul>
-<li><b>Single replica everywhere</b> - <code>replicas: 1</code> on both Deployments means a rolling update briefly has zero old pods and one new one; there's no redundancy during that window</li>
-<li><b>No liveness/readiness probes</b> - Kubernetes has no way to know if PHP-FPM or nginx is actually healthy versus just running</li>
-<li><b>No resource requests/limits</b> - pods can consume unbounded CPU/memory on a single shared host, which is a real risk given everything runs on one physical server</li>
-</ul>
+<li><b>Resource Limits & Quotas</b>Currently, workloads run without strict requests and limits. On a hardware-constrained server, an unconstrained pod 
+(e.g., Prometheus ingestion spikes) risks causing OOM (Out Of Memory) kills on neighboring workloads. 
+Implementing CPU/memory boundaries is the immediate next priority for cluster stability.
+<li><b>No liveness/readiness probes</b> - Kubernetes has no way to know if PHP-FPM or nginx is actually healthy versus just running. Health checks must reflect actual application readiness, not just binary existence.</li>
+<li><b>Anti-affinity rules</b>To prevent disk I/O bottlenecks, high-volume disk writers are explicitly separated. 
+For example, Grafana and Prometheus utilize <code>podAntiAffinity</code> to prevent co-location on the same worker node, preventing SQLite backing store lockups 
+caused by Prometheus TSDB write contention.</ul>
 </div>
 
 

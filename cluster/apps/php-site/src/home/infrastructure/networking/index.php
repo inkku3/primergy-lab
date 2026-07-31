@@ -12,6 +12,7 @@ $pageTitle = "inkku - infrastructure/networking";
     <a href="/infrastructure/gitops" class="sidebar-link">GitOps pipeline</a>
     <a href="/infrastructure/kubernetes" class="sidebar-link">Kubernetes</a>
     <a href="/infrastructure/networking" class="sidebar-link active">Networking</a>
+    <a href="/infrastructure/monitoring" class="sidebar-link">Monitoring & Observability</a>
 </nav>
 
 
@@ -26,9 +27,19 @@ Two distinct concerns live under "networking" here: how public traffic reaches a
  Only the first exists today.
 The public path runs through Cloudflare, a dedicated tunnel VM, and a cluster-level ingress controller.
 
-
+<h4>Dual Ingress: HTTP vs. TCP</h4>
+A major architectural decision was acknowledging that one ingress method doesn't fit all protocols. 
+Forcing everything through a single proxy is a common anti-pattern.
+<ul>
+  <li><b>HTTP(s) Traffic (Websites, Matomo, Live Maps)</b> - Flows exclusively through the Cloudflare Tunnel. 
+  This removes the need for any inbound firewall ports on the home network and pushes TLS termination to the edge.</li>
+  <li><b>Raw-TCP Traffic (Minecraft)</b> - Cloudflare’s free tier only proxies HTTP(s). 
+  Attempting to tunnel a game server through it fundamentally doesn't work. Instead, the game port (non-standard for security) is forwarded through the router 
+  directly to a K3s LoadBalancer Service (utilizing K3s's built-in ServiceLB). 
+  A custom DNS SRV record lets players connect cleanly without typing port numbers, while keeping the server's origin IP unproxied.</li>
+</ul>
 <div class="infostack">
-<h4>Hop by hop</h4>
+<h4>HTTPs hop by hop</h4>
 <ol>
 <li><b>Browser</b> - resolves <code>inkku.xyz</code> via Cloudflare DNS</li>
 <li><b>Cloudflare</b> - terminates TLS, applies WAF rules, forwards over the tunnel</li>
@@ -47,8 +58,7 @@ Here nginx is not the ingress. The distinction matters for understanding where a
 <li><b>Application nginx</b> - a Pod, not a cluster component. It's <code>php-site</code>-specific: PHP routing, static files, and the reverse-proxy hop to the Azure-hosted Kaatokänni400 app all happen here, one layer below where Kubernetes' own routing ends.</li>
 </ul>
 </div>
-Traefik's job is only seledcting the right Service.
-What that Service's Pod does with the request from there is application logic, not cluster infrastructure. 
+Traefik's job is only selecting the right Service. What that Service's Pod does with the request from there is application logic, not cluster infrastructure.
 You can see the Kubernetes page for how <code>php-site</code> handles it.
 
 <h3 class="subheading">Why the tunnel gets its own VM</h3>
@@ -90,13 +100,16 @@ cutting exposure to the rest of the internet by default</li>
 </ul>
 </div>
 
-<h3 class="subheading">Known gaps</h3>
+<h3 class="subheading">Known gaps & Future plans</h3>
 <div class="infostack">
 <ul>
-<li><b>Tunnel routing isn't version-controlled</b></li>
-<li><b>No separate management network</b> - reaching Proxmox, 
+<li><b>Tunnel routing isn't version-controlled</b> - Right now, mapping <code>inkku.xyz</code> to the in-cluster Traefik service requires manual clicks in the 
+Cloudflare Zero Trust dashboard. This breaks the strict GitOps philosophy used everywhere else in the project. 
+The planned fix is to adopt the Cloudflare Terraform provider to manage the tunnel, ingress rules, and DNS records declaratively alongside the VMs. 
+This ensures that if the tunnel configuration is ever lost, recreating it is just a <code>terraform apply</code> away, requiring zero manual UI clicks.</li>
+<li><b>No separate management network</b> - Reaching Proxmox, 
 SSHing into a VM, or managing the cluster directly still depends on already being on the home network. 
-Tailscale is planned specifically to close this with a private, authenticated overlay separate from the public ingress path above</li>
+Tailscale is planned specifically to close this with a private, authenticated overlay that completely separates the admin control plane from the public ingress path.</li>
 </ul>
 </div>
 

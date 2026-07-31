@@ -12,6 +12,7 @@ $pageTitle = "inkku - infrastructure";
     <a href="/infrastructure/gitops" class="sidebar-link">GitOps pipeline</a>
     <a href="/infrastructure/kubernetes" class="sidebar-link">Kubernetes</a>
     <a href="/infrastructure/networking" class="sidebar-link">Networking</a>
+    <a href="/infrastructure/monitoring" class="sidebar-link">Monitoring & Observability</a>
 </nav>
 
 
@@ -32,17 +33,21 @@ There is a full deployment pipeline from <code>git push</code> to a live rolling
 <div class="infostack">
 <h4>Goals:</h4>
 <ul>
-<li>Build a production-style deployment platform</li>
-<li>Automate infrastructure provisioning </li>
-<li>Build a real GitOps loop </li>
-<li>Separate provisioning from configuration management </li>
-<li>Understand workload scheduling and resilience within a single host, constrained environment</li>
+<li>Build a production-grade GitOps loop: Automate deployments from git push to live rolling updates.</li>
+<li>Match infrastructure complexity to actual requirements, avoiding unnecessary enterprise bloat for a homelab environment.</li>
+<li>Keep infrastructure provisioning (Terraform), configuration management (Ansible), and workload scheduling (Kubernetes) strictly decoupled.</li>
+<li>Understand workload distribution, resource limits, and I/O contention within a single physical host.</li>
 </ul>
 </div>
 
 <h3 class="subheading">Architecture</h3>
-The entire platform runs on a single enterprise-grade Fujitsu Primergy RX2530 M2 rack server. Terraform provisions 5 VMs inside Proxmox using a Ubuntu Server cloud-init template.
+The entire platform runs on a single enterprise-grade Fujitsu Primergy RX2530 M2 rack server via Proxmox. 
+Operating within a strict 120GB SSD storage constraint, Terraform provisions five VMs based on an Ubuntu Server cloud-init template, and Ansible handles the OS-level stack and K3s bootstrapping.
 <img class="zoomD" src="/infrastructure/img/arch_final.svg" id="architecture">
+Rather than cloning identical nodes, 
+the K3s cluster uses five VMs sized strictly by role (control-plane, two workers, utility, and a dedicated Cloudflare tunnel). 
+This was a deliberate choice as the control-plane and utility VMs don't run application pods, 
+so keeping them lean prevents them from wasting hardware resources that the application workers actually need.<br><br>
 Because everything runs on one physical host, this is workload distribution and fault isolation at the VM/pod level.
 As all virtual machines ultimately share the same hardware, 
 the platform provides workload isolation rather than true high availability. A hardware failure would still take down the entire environment.
@@ -54,7 +59,8 @@ the platform provides workload isolation rather than true high availability. A h
 <li><b>Terraform</b> - declarative infrastructure provisioning and reproducible VM creation</li>
 <li><b>Ansible</b> - idempotent server configuration, separates infra provisioning from configuration</li>
 <li><b>Kubernetes (k3s)</b> - lightweight enough for the hardware, still teaches real orchestration concepts</li>
-<li><b>Cloudflare Tunnel</b> - removes the need for inbound ports while handling TLS termination and public exposure</li>
+<li><b>Dual Ingress Strategy</b> - Cloudflare Tunnel handles all HTTPs traffic (terminating TLS without exposing inbound ports),
+ while a direct router port-forward to a K3s LoadBalancer Service handles raw-TCP traffic (like Minecraft) that Cloudflare's free tier cannot proxy</li>
 <li><b>Argo CD / GitOps</b> - Git is the single source of truth. Every change is auditable and revertible through Git history</li>
 </ul>
 </div>
@@ -106,8 +112,8 @@ WAF features allow region blocking. Currently only traffic from Finland and Swed
   </tr>
   <tr>
     <td>Monitoring</td>
-    <td>Planned</td>
-    <td>Grafana and Prometheus stack</td>
+    <td style="color:#30D900">OK &#10004;</td>
+    <td>Prometheus, Alertmanager, Grafana, kube-state-metrics, node-exporter</td>
   </tr>
   <tr>
     <td>Tailscale</td>
@@ -155,8 +161,8 @@ WAF features allow region blocking. Currently only traffic from Finland and Swed
   </tr>
   <tr>
     <td>Monitoring</td>
-    <td>To be planned</td>
-    <td>Planned</td>
+    <td>Kubernetes</td>
+    <td style="color:#30D900">Live &#10004;</td>
   </tr>
 </table>
 <br>
@@ -164,6 +170,13 @@ Not every project is hosted on the Kubernetes cluster.
 <b><a href="https://inkku.xyz/projects/kaatokanni400/">Kaatokänni400</a> </b>currently runs on <b>Azure App Service</b> and is integrated into the portfolio through an nginx reverse proxy. 
 Its architecture and deployment pipeline are documented separately.
 <br>
+
+<h3>Design decisions and trade-offs</h3>
+As the entire setup runs on a single 120GB SSD this is a rather limited amount of storage.
+Due to this I explicitly rejected replicated storage solutions like Longhorn or OpenEBS. 
+For a single-node physical host, multi-node replication adds severe storage overhead and complexity to solve a fault-tolerance 
+problem this specific hardware setup doesn't even have.
+
 <h4>Source code on GitHub</h4>
 <b><a href="https://github.com/inkku3/primergy-lab/tree/main">Current infrastructure</a></b><br>
 <b><a href="https://github.com/inkku3/kaatokanni400">Kaatokänni400</a></b><br>

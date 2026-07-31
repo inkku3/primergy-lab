@@ -12,6 +12,7 @@ $pageTitle = "inkku - infrastructure/gitops";
     <a href="/infrastructure/gitops" class="sidebar-link active">GitOps pipeline</a>
     <a href="/infrastructure/kubernetes" class="sidebar-link">Kubernetes</a>
     <a href="/infrastructure/networking" class="sidebar-link">Networking</a>
+    <a href="/infrastructure/monitoring" class="sidebar-link">Monitoring & Observability</a>
 </nav>
 
   <div id="lb-back">
@@ -90,6 +91,15 @@ images:
 
 The two empty <code>newTag</code> fields are the only lines in the entire repository that the bot modifies. 
 Because Image Updater bumps both tags in a single commit, PHP and Nginx always roll out together, meaning no version drift.
+
+
+<h4>Multi-source Applications</h4>
+For third-party workloads like Matomo and the Prometheus observability stack, I use ArgoCD's multi-source feature. 
+Instead of fragmenting related infrastructure across multiple ArgoCD Applications, a single Application object combines a remote Helm chart (from an OCI registry) 
+with locally authored Kubernetes manifests and values from the Git repository.
+<br><br>
+This keeps tightly-coupled components like the Matomo web app and its hand-rolled MariaDB StatefulSet under one sync status, one health check, and one rollback version.
+
 
 <h4 class="subheading">Traceability</h4>
 Since every single deployment generates a Git commit, the audit trail for production is literally just <code>git log</code>. 
