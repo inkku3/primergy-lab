@@ -4,8 +4,10 @@ on:
   push:
     branches:
       - main
-    paths-ignore:
-      - cluster/apps/php-site/k8s/**
+    paths:
+      - 'cluster/apps/php-site/**'
+      - 'cluster/argocd/php-site.yaml'
+      - '!cluster/apps/php-site/k8s/**'
 
 permissions:
   contents: read
