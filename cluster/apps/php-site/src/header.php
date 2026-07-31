@@ -29,7 +29,7 @@ _paq.push(["setDomains", ["*.inkku.xyz"]]);
 _paq.push(['trackPageView']);
 _paq.push(['enableLinkTracking']);
 (function() {
-    var u="//matomo.inkku.xyz/";
+    var u="//track.inkku.xyz/";
     _paq.push(['setTrackerUrl', u+'matomo.php']);
     _paq.push(['setSiteId', '2']);
     var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
