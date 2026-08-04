@@ -12,6 +12,8 @@ spec:
     metadata:
       labels: { app: keittokirja-backend }
     spec:
+      imagePullSecrets:
+        - name: ghcr-pull-secret
       containers:
         - name: backend
           image: ghcr.io/inkku3/keittokirja-backend:sha-10ca78cc32027389bfe70aadebe40e4f410aa668
