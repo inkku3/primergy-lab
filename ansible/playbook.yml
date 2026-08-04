@@ -42,6 +42,8 @@
   hosts: utility
   vars_files:
     - vars/secrets.yml
+  vars:
+    keittokirja_migration_sql_path: "{{ playbook_dir }}/../cluster/apps/keittokirja/backend/keittokirja_migration.sql"
   tasks:
     - import_tasks: tasks/cookbook_secrets.yml
 
@@ -63,5 +65,7 @@
   hosts: utility
   tasks:
     - import_tasks: tasks/argocd_apps.yml
+  tags:
+    - argocd-apps
 
 

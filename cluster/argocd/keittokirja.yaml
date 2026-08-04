@@ -5,7 +5,7 @@ metadata:
   name: keittokirja
   namespace: argocd
   annotations:
-    argocd-image-updater.argoproj.io/image-list: backend=ghcr.io/you/recipe-backend,frontend=ghcr.io/you/recipe-frontend
+    argocd-image-updater.argoproj.io/image-list: backend=ghcr.io/inkku3/keittokirja-backend:sha-10ca78cc32027389bfe70aadebe40e4f410aa668,ghcr.io/inkku3/keittokirja-frontend:sha-10ca78cc32027389bfe70aadebe40e4f410aa668
     argocd-image-updater.argoproj.io/backend.update-strategy: newest-build
     argocd-image-updater.argoproj.io/backend.allow-tags: "regexp:^sha-"
     argocd-image-updater.argoproj.io/frontend.update-strategy: newest-build
@@ -14,7 +14,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/inkku3/primergy-lab.git
-    path: manifests/keittokirja
+    path: cluster/apps/keittokirja
   destination:
     server: https://kubernetes.default.svc
     namespace: keittokirja

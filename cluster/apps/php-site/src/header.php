@@ -71,7 +71,9 @@ _paq.push(['enableLinkTracking']);
                 <a href="https://inkku.xyz/infrastructure/ansible">Ansible</a>
                 <a href="https://inkku.xyz/infrastructure/gitops">GitOps</a>
                 <a href="https://inkku.xyz/infrastructure/kubernetes">Kubernetes</a>
-                <a href="https://inkku.xyz/infrastructure">Networking</a>
+                <a href="https://inkku.xyz/infrastructure/networking">Networking</a>
+                <a href="https://inkku.xyz/infrastructure/monitoring">Monitoring</a>
+
             </div>
         </div>
     
@@ -109,7 +111,8 @@ _paq.push(['enableLinkTracking']);
                 <a href="https://inkku.xyz/infrastructure/ansible">Ansible</a>
                 <a href="https://inkku.xyz/infrastructure/gitops">GitOps</a>
                 <a href="https://inkku.xyz/infrastructure/kubernetes">Kubernetes</a>
-                <a href="https://inkku.xyz/infrastructure">Networking</a>
+                <a href="https://inkku.xyz/infrastructure/networking">Networking</a>
+                <a href="https://inkku.xyz/infrastructure/monitoring">Monitoring</a>
 
             </div>
     </div>

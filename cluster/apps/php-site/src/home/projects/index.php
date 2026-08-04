@@ -21,21 +21,6 @@ $pageTitle = "inkku - projects";
 </section>
 
 
-<!-- Metrics -->
-<a href="https://metrics.inkku.xyz/" class="portfolio-link">
-<section class="project-section">
-  <div class="project-content">
-    <img src="/thumbnails/metrics.png" class="link-image" alt="KaatoKänni400 thumbnail" />
-    <div class="project-text">
-      <h3>metrics.inkku.xyz</h3>
-      <p>A dedicated site to monitoring server performance using collectd made into pretty charts.</p>
-    </div>
-  </div></a>
-    <div class="mini-link">
-      <a href="https://inkku.xyz/projects/metrics/">Documentation</a></div>
-</section>
-
-
 <!-- Keittokirja -->
  <a href="https://keittokirja.inkku.xyz/" class="portfolio-link">
 <section class="project-section">
