@@ -1,0 +1,11 @@
+# cluster/apps/keittokirja/backend/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: keittokirja-backend
+  namespace: keittokirja
+spec:
+  selector: { app: keittokirja-backend }
+  ports:
+    - port: 8000
+      targetPort: 8000

@@ -1,0 +1,36 @@
+# cluster/apps/keittokirja/backend/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keittokirja-backend
+  namespace: keittokirja
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: keittokirja-backend }
+  template:
+    metadata:
+      labels: { app: keittokirja-backend }
+    spec:
+      containers:
+        - name: backend
+          image: ghcr.io/inkku3/keittokirja-backend:sha-10ca78cc32027389bfe70aadebe40e4f410aa668
+          ports:
+            - containerPort: 8000
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: keittokirja-db-app
+                  key: uri
+            - name: CORS_ORIGINS
+              value: "https://keittokirja.inkku.xyz"
+            - name: API_DEBUG
+              value: "false"
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi

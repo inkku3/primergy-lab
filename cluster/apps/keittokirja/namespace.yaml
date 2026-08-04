@@ -1,0 +1,5 @@
+# cluster/apps/keittokirja/namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: keittokirja

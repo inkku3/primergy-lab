@@ -1,0 +1,26 @@
+# cluster/apps/keittokirja/frontend/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keittokirja-frontend
+  namespace: keittokirja
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: keittokirja-frontend }
+  template:
+    metadata:
+      labels: { app: keittokirja-frontend }
+    spec:
+      containers:
+        - name: frontend
+          image: ghcr.io/inkku3/keittokirja-frontend:sha-10ca78cc32027389bfe70aadebe40e4f410aa668
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: 20m
+              memory: 32Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi

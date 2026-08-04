@@ -38,6 +38,13 @@
   tasks:
     - import_tasks: tasks/cloudflared.yml
 
+- name: Install cookbook secrets
+  hosts: utility
+  vars_files:
+    - vars/secrets.yml
+  tasks:
+    - import_tasks: tasks/cookbook_secrets.yml
+
 - name: Install Argo CD
   hosts: utility
   vars_files:

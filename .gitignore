@@ -1,6 +1,4 @@
 /cluster/apps/php-site/notes.txt
-/cluster/apps/keittokirja-backup/
-/cluster/apps/cookbook/
 /cluster/apps/minecraft/k8s/secret.yaml
 cluster/apps/minecraft/k8s/secrets/whitelist.txt
 
@@ -9,3 +7,6 @@ cluster/apps/minecraft/k8s/secrets/whitelist.txt
 *.backup
 **/.terraform/
 /ansible/vars/secrets.yml
+.ansible
+.ansible/vault-password
+keittokirja_migration.sql
