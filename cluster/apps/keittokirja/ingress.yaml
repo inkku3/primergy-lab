@@ -4,8 +4,6 @@ kind: Ingress
 metadata:
   name: keittokirja
   namespace: keittokirja
-  annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: websecure
 spec:
   rules:
     - host: keittokirja.inkku.xyz
@@ -16,10 +14,12 @@ spec:
             backend:
               service:
                 name: keittokirja-backend
-                port: { number: 8000 }
+                port:
+                  number: 8000
           - path: /
             pathType: Prefix
             backend:
               service:
                 name: keittokirja-frontend
-                port: { number: 80 }
+                port:
+                  number: 80
