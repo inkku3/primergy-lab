@@ -10,4 +10,4 @@ images:
   - name: ghcr.io/inkku3/keittokirja-backend
     newTag: sha-319431299de3bca304155b8abb1e28ecd029d197
   - name: ghcr.io/inkku3/keittokirja-frontend
-    newTag: sha-319431299de3bca304155b8abb1e28ecd029d197
+    newTag: sha-cd8f3771a5ee9bd8cf179c9ea738ec50549eeff5
