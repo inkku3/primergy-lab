@@ -18,4 +18,4 @@ spec:
       postInitApplicationSQLRefs:
         secretRefs:
         - name: keittokirja-bootstrap
-          key: keittokirja_migration.sql
+          key: keittokirja_bootstrap.sql

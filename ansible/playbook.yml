@@ -43,7 +43,7 @@
   vars_files:
     - vars/secrets.yml
   vars:
-    keittokirja_migration_sql_path: "{{ playbook_dir }}/../cluster/apps/keittokirja/backend/keittokirja_migration.sql"
+    keittokirja_bootstrap_sql_path: "{{ playbook_dir }}/../cluster/apps/keittokirja/postgres/keittokirja_bootstrap.sql"
   tasks:
     - import_tasks: tasks/cookbook_secrets.yml
 
