@@ -9,4 +9,3 @@ cluster/apps/minecraft/k8s/secrets/whitelist.txt
 /ansible/vars/secrets.yml
 .ansible
 .ansible/vault-password
-keittokirja_migration.sql
