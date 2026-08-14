@@ -1414,18 +1414,6 @@ Oliiviöljyä ja voita$q$, $q$Freesaa sipuli, lisää vihannekset, linssit, timj
 1/2 tl sokeria
 2,5 dl vettä
 Öljyä tai voita$q$, $q$Kiehauta vesi. Ruskista jauho rasvassa vähintään piparkakun väriseksi. Kaada vesi sekaan voimakkaasti sekoittaen. Lisää muut ainekset ja kiehuta 5–10 minuuttia.$q$, NULL),
-($q$parsa-pasta$q$, $q$Parsapasta$q$, $q$Nippu parsaa
-300 g pastaa
-2 dl kermaa
-1/2 tl minttua
-1 pieni sipuli$q$, $q$Kuori parsa ja hienonna sipuli. Keitä parsa suolavedessä noin 4 minuuttia ja nosta pois. Keitä pasta. Kuullota sipuli, lisää kerma ja minttu sekä parsa ja sekoita kastike pastaan.$q$, NULL),
-($q$paahdetut-perunakiekot$q$, $q$Paahdetut perunakiekot$q$, $q$1 kg kiinteää perunaa
-Oliivi- tai rypsiöljyä
-Timjamia
-Sipulijauhetta
-Valkosipulijauhetta
-Suolaa
-(MSG:tä)$q$, $q$Viipaloi perunat 8–10 mm kiekoiksi. Keitä 2 % suolavedessä 12 minuuttia ja kuivata höyryssä. Sekoita öljy ja mausteet joukkoon. Paahda grillivastuksen alla 225 °C:ssa noin puoli tuntia, kunnes ruskistuvat.$q$, NULL),
 ($q$eekun-tomaattikastike$q$, $q$Eekun tomaattikastike$q$, $q$Purkki tomaattimurskaa
 Viinietikkaa
 Suolaa
@@ -1754,10 +1742,6 @@ INSERT INTO recipe_tags (recipe_id, tag) VALUES
 ($q$ranskalaiset-linssit$q$, $q$lisuke$q$),
 ($q$ranskalaiset-linssit$q$, $q$kasvis$q$),
 ($q$sauce-espagnole$q$, $q$kastike$q$),
-($q$parsa-pasta$q$, $q$pääruoka$q$),
-($q$parsa-pasta$q$, $q$kasvis$q$),
-($q$paahdetut-perunakiekot$q$, $q$lisuke$q$),
-($q$paahdetut-perunakiekot$q$, $q$kasvis$q$),
 ($q$eekun-tomaattikastike$q$, $q$kastike$q$),
 ($q$killan-silli$q$, $q$lisuke$q$),
 ($q$killan-silli$q$, $q$kala$q$),
