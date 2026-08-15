@@ -1,0 +1,38 @@
+#cluster/traefik/helmchartconfig.yaml
+apiVersion: helm.cattle.io/v1
+kind: HelmChartConfig
+metadata:
+  name: traefik
+  namespace: kube-system
+spec:
+  valuesContent: |-
+    logs:
+      access:
+        enabled: true
+
+    service:
+      type: NodePort
+      spec:
+        ipFamilyPolicy: PreferDualStack
+        externalTrafficPolicy: Local
+
+    ports:
+      web:
+        nodePort: 30080
+        forwardedHeaders:
+          trustedIPs:
+            - "192.168.0.105/32"
+      websecure:
+        nodePort: 30443
+        forwardedHeaders:
+          trustedIPs:
+            - "192.168.0.105/32"
+
+    deployment:
+      kind: DaemonSet
+
+    updateStrategy:
+      type: RollingUpdate
+      rollingUpdate:
+        maxUnavailable: 1
+        maxSurge: 0
