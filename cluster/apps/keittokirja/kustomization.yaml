@@ -8,6 +8,6 @@ resources:
   - postgres/
 images:
   - name: ghcr.io/inkku3/keittokirja-backend
-    newTag: sha-62a28d2ced111bdee691d09477e21dbf0b068981
+    newTag: sha-7bd13058b5b5d06b36c2342bc612c1c3263dec90
   - name: ghcr.io/inkku3/keittokirja-frontend
-    newTag: sha-62a28d2ced111bdee691d09477e21dbf0b068981
+    newTag: sha-7bd13058b5b5d06b36c2342bc612c1c3263dec90
