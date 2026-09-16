@@ -79,13 +79,9 @@ _paq.push(['enableLinkTracking']);
     
         <a href="https://inkku.xyz/projects">
             <button class="dropbtn"">Projects</button></a>
-        <div class="dropdown">
-            <button class="dropbtn" onclick="toggleMobileDropdown(this)">About</button>            
-            <div class="dropdown-content">
-                <a href="https://inkku.xyz/about">Contact</a>
-                <a href="https://inkku.xyz/about/site">Site</a>
-            </div>
-        </div>
+        <a href="https://inkku.xyz/about">
+            <button class="dropbtn"">About</button></a>
+
     </div>
 </div>
 
@@ -117,13 +113,8 @@ _paq.push(['enableLinkTracking']);
             </div>
     </div>
         <a href="https://inkku.xyz/projects" class="nav-link">Projects</a>
-        <div class="dropdown">
-            <button class="dropbtn">About</button>
-            <div class="dropdown-content">
-                <a href="https://inkku.xyz/about">Contact</a>
-                <a href="https://inkku.xyz/about/site">Site</a>
-            </div>
-        </div>
+        <a href="https://inkku.xyz/about" class="nav-link">About</a>
+
     </div>
 </div>           
 

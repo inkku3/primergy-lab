@@ -27,13 +27,13 @@ $pageTitle = "inkku - projects";
   <div class="project-content">
     <img src="/thumbnails/keitto.png" class="link-image" alt="KaatoKänni400 thumbnail" />
     <div class="project-text">
-      <h3>keittokirja.inkku.xyz</h3>
+      <h3>Keittokirja</h3>
       <p>A digitized version of a family cookbook. 
           Recipes are in no way moderated and might feature mature language.</p>
     </div>
   </div></a>
   <div class="mini-link">
-      <a href="https://keittokirja.inkku.xyz/">Keittokirja</a></div>
+      <a href="https://github.com/inkku3/keittokirja">Source code</a></div>
 </section>
 
  <a href="https://inkku.xyz/projects/portfolio/" class="portfolio-link">
