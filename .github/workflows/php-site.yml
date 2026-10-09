@@ -37,7 +37,25 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push PHP image
+      - name: Build PHP image (local)
+        uses: docker/build-push-action@v6
+        with:
+          context: ./cluster/apps/php-site
+          file: ./cluster/apps/php-site/php/Dockerfile
+          load: true
+          tags: ${{ env.PHP_IMAGE }}:${{ github.sha }}
+          cache-from: type=gha,scope=php
+          cache-to: type=gha,scope=php,mode=max
+
+      - name: Trivy scan PHP image
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: ${{ env.PHP_IMAGE }}:${{ github.sha }}
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: '0'
+
+      - name: Push PHP image
         uses: docker/build-push-action@v6
         with:
           context: ./cluster/apps/php-site
@@ -46,8 +64,27 @@ jobs:
           tags: |
             ${{ env.PHP_IMAGE }}:${{ github.sha }}
             ${{ env.PHP_IMAGE }}:latest
+          cache-from: type=gha,scope=php
 
-      - name: Build and push Nginx image
+      - name: Build Nginx image (local)
+        uses: docker/build-push-action@v6
+        with:
+          context: ./cluster/apps/php-site
+          file: ./cluster/apps/php-site/nginx/Dockerfile
+          load: true
+          tags: ${{ env.NGINX_IMAGE }}:${{ github.sha }}
+          cache-from: type=gha,scope=nginx
+          cache-to: type=gha,scope=nginx,mode=max
+
+      - name: Trivy scan Nginx image
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: ${{ env.NGINX_IMAGE }}:${{ github.sha }}
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: '0'
+
+      - name: Push Nginx image
         uses: docker/build-push-action@v6
         with:
           context: ./cluster/apps/php-site
@@ -56,4 +93,5 @@ jobs:
           tags: |
             ${{ env.NGINX_IMAGE }}:${{ github.sha }}
             ${{ env.NGINX_IMAGE }}:latest
+          cache-from: type=gha,scope=nginx
 
