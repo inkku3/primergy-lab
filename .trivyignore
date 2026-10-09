@@ -1,0 +1,9 @@
+
+AVD-KSV-0014
+# KSV-0014: Set readOnlyRootFilesystem to true where compatible, adding writable volumes for paths that require writes.
+
+AVD-KSV-0118
+# KSV-0118: Define explicit security contexts and run containers as non-root where supported.
+
+AVD-DS-0002
+# DS-0002: Update Dockerfiles to use non-root users, ensuring file permissions and service startup continue to work.
