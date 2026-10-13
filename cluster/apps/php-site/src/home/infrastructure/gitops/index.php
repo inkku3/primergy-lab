@@ -27,10 +27,10 @@ $pageTitle = "inkku - infrastructure/gitops";
 
 <h3 class="subheading">Summary</h3>
 <code>git push</code> is the only way deployments happen here. When code gets pushed, 
-GitHub Actions builds the new PHP and nginx images. 
-Argo CD's Image Updater spots them in the registry, writes the new tags back to Git, and Argo CD syncs the cluster to match. 
-Git stays the absolute source of truth, and the cluster cannot drift from what's in the repo for more than a few minutes.
-
+GitHub Actions builds and publishes new container images, Argo CD Image Updater updates the deployment manifests, 
+and Argo CD synchronizes the cluster to match the new desired state. Git stays the absolute source of truth, 
+and the cluster cannot drift from what's in the repo for more than a few minutes.<br>
+The Kubernetes cluster is never updated manually.
 <h3 class="subheading">The loop</h3>
 <img class="zoomD" src="../infrastructure/img/GitOps_final.svg" id="gitops-graph">
 
@@ -39,6 +39,7 @@ Git stays the absolute source of truth, and the cluster cannot drift from what's
 <ol>
 <li><b><code>git push</code></b> - push some code to GitHub.</li>
 <li><b>GitHub Actions</b> - get triggered, builds the PHP and Nginx images, tags them with the commit SHA, and pushes them into GHCR.</li>
+<li><b>Trivy</b> - performs a vulnerability scan</li>
 <li><b>Argo CD Image Updater</b> - scans GHCR, sees the fresh tags, and updates the image refs in <code>kustomization.yaml</code>.</li>
 <li><b><code>git commit</code></b> - Image Updater automatically commits that YAML tweak back to the repo (as <code>argocd-image-updater</code>). 
       This commit is now our desired state.</li>
@@ -49,9 +50,13 @@ Git stays the absolute source of truth, and the cluster cannot drift from what's
 Only the first step (git push) is manual.<br>
 Image Updater reuses the same GitHub PAT we used to register the repo, meaning the write-back commit belongs to the bot, not a developer.
 <br><br>
+
+
+
 <h4 class="subheading">Avoiding an infinite loop</h4>
 Because step 4 commits right back into the repo, we're basically asking for an infinite loop. 
-The bot commits, Actions sees the commit and builds, the bot sees the build and commits... you get the idea. We use two checks to kill that cycle:
+The bot commits, Actions sees the commit and builds, the bot sees the build and commits... 
+you get the idea. We use two checks to kill that cycle:
 
 <div class="infostack">
 <h4>In the GitHub Actions workflow</h4>
@@ -93,19 +98,19 @@ The two empty <code>newTag</code> fields are the only lines in the entire reposi
 Because Image Updater bumps both tags in a single commit, PHP and Nginx always roll out together, meaning no version drift.
 
 
-<h4>Multi-source Applications</h4>
+<h4>Multi-source applications</h4>
 For third-party workloads like Matomo and the Prometheus observability stack, I use ArgoCD's multi-source feature. 
 Instead of fragmenting related infrastructure across multiple ArgoCD Applications, a single Application object combines a remote Helm chart (from an OCI registry) 
 with locally authored Kubernetes manifests and values from the Git repository.
 <br><br>
-This keeps tightly-coupled components like the Matomo web app and its hand-rolled MariaDB StatefulSet under one sync status, one health check, and one rollback version.
+This keeps tightly-coupled components like the Matomo web app and its MariaDB StatefulSet under one sync status, one health check, and one rollback version.
 
 
 <h4 class="subheading">Traceability</h4>
 Since every single deployment generates a Git commit, the audit trail for production is literally just <code>git log</code>. 
-You can easily skim the history and spot the bot's routine image updates versus actual humans tweaking the infrastructure.
+You can easily skim the history and spot the bot's routine image updates versus an actual human (me) tweaking the infrastructure.
 <br><br>
-In the future there are plans to add ansible lint and terraform fmt to the CI stage.
+In the future there are plans to add ansible lint and terraform fmt to the CI stage. Automated testing would also be good.
 
 <br>
 

@@ -24,24 +24,25 @@ $pageTitle = "inkku - infrastructure/terraform";
 <div class="site-content-box">
 
 <h3 class="subheading">Summary</h3>
-Terraform provisions the 5 VMs that make up the platform inside Proxmox, cloning each from a shared template and sizing it for its specific role.
-This is the first stage of the pipeline. Everything downstream (Ansible, k3s, ArgoCD) assumes these VMs already exist, are reachable, and are correctly sized.
-Terraform's job stops at an existing bootable VM that is reachable by SSH. It does not configure anything inside the OS.
+Terraform provisions the 5 VMs that make up the platform inside Proxmox, 
+cloning each from the same template and sizing it for its specific role.
+Everything else (Ansible, k3s, ArgoCD) assumes these VMs already exist, are reachable, and are correctly sized.
+Terraform's job stops at an existing bootable VM that is reachable by SSH. 
+It does not configure anything inside the OS.
 
 <div class="infostack">
-<h4>What Terraform owns here:</h4>
+<h4>What Terraform does</h4>
 <ul>
 <li>Provider connection to Proxmox (<code>bpg/proxmox</code>, via API endpoint + token auth)</li>
-<li>VM definitions for each named role driven by a single <code>vms</code> map variable</li>
-<li>Per-role sizing: cores, memory, and disk scaled to what each role actually needs</li>
+<li>VM definitions for each role driven by a single <code>vms</code> map variable</li>
+<li>Per-role sizing: cores, memory, and disk scaled to what each VM actually needs</li>
 <li>Cloud-init injection for the <code>ansible</code> user, SSH key, and static IPs</li>
 <li>Dynamically generating the Ansible inventory file from the resulting VM IPs</li>
 </ul>
 </div>
 
 <h3 class="subheading">VM layout</h3>
-Rather than five identical nodes, each VM is sized for its role. Worker nodes carry the actual application load and are provisioned accordingly.
-The cloudflared tunnel VM does one job and gets exactly the resources that job needs.
+Rather than five identical nodes, each VM is sized for its role. 
 <table>
   <tr>
     <th>Role</th>
@@ -53,7 +54,7 @@ The cloudflared tunnel VM does one job and gets exactly the resources that job n
   <tr>
     <td>control-plane</td>
     <td>2</td>
-    <td>4 GB</td>
+    <td>6 GB</td>
     <td>20 GB</td>
     <td>192.168.0.101</td>
   </tr>
@@ -81,47 +82,39 @@ The cloudflared tunnel VM does one job and gets exactly the resources that job n
   <tr>
     <td>cloudflared</td>
     <td>1</td>
-    <td>1 GB</td>
+    <td>2 GB</td>
     <td>10 GB</td>
     <td>192.168.0.105</td>
   </tr>
 </table>
 <br>
-The two workers carry the real compute budget of the host, leaving the control-plane and utility VMs lean since they don't run application workloads directly.
+The two workers carry the real compute budget of the host, leaving the control-plane and utility VMs 
+lean since they don't run application workloads directly.
+The cloudflared tunnel VM does one job and gets exactly the resources that job needs.
 Because this entire platform runs on a host with a hard 120GB SSD limit, capacity planning had to be exact. 
-The two worker nodes carry the real compute and storage budget for application workloads. 
-The control-plane and utility VMs are kept extremely lean since they don't run application pods.
-<br><br>
-This specific configuration allocates exactly 114GB of the 120GB available, 
-leaving a 6GB safety margin for Proxmox OS overhead and LVM metadata. There is zero room for over-provisioning or wasted capacity.
-<h3 class="subheading">Provisioning flow</h3>
-A single <code>terraform apply</code> loops over the <code>vms</code> map with <code>for_each</code>, 
-cloning every VM from the same template but applying each role's own cores/memory/disk/IP. Adding a node is a one-line map entry.
-
-
-
+The VM allocation totals 114 GB, leaving roughly 6 GB available for Proxmox overhead and LVM metadata.
 
   <!-- LIGHTBOX CONTAINER -->
   <div id="lb-back">
     <div id="lb-img"></div>
   </div>
 
-  <img class="zoomD" src="/infrastructure/terraform/terraform_final.svg" id="gitops-graph">
+  <img class="zoomD" src="/infrastructure/terraform/terraform_final.svg" id="terraform-graph">
 
 
+<h3 class="subheading">Provisioning flow</h3>
+A single <code>terraform apply</code> loops over the <code>vms</code> map with <code>for_each</code>, 
+cloning every VM from the same template but applying each role's own cores/memory/disk/IP. 
+<br><br>
+Adding another node only requires a new entry in the map.
 
 <div class="infostack">
-<h4>VM resource definition</h4>
+<h4>VM resource definition example</h4>
 <pre><code style="font-size: 14px; line-height: 1.3;">resource "proxmox_virtual_environment_vm" "vm" {
   for_each  = var.vms
-  name      = each.key
-  node_name = var.proxmox_node_name
-  vm_id     = each.value.vmid
 
-  clone {
-    vm_id = "9000" # mallipohjan id
-    full  = true
-  }
+  name      = each.key
+  vm_id     = each.value.vmid
 
   cpu {
     cores = each.value.cores
@@ -131,27 +124,10 @@ cloning every VM from the same template but applying each role's own cores/memor
     dedicated = each.value.memory
   }
 
-  disk {
-    datastore_id = "local-lvm"
-    interface    = "scsi0"
-    size         = each.value.disk
-    ssd          = true
-  }
-
-  network_device {
-    bridge = "vmbr0"
-  }
-
-  agent {
-    enabled = false
-  }
-
+  ...
+  
   initialization {
-    user_account {
-      username = "ansible"
-      keys     = [var.ssh_public_key]
-      password = var.virtual_environment_root_password
-    }
+    ...
     ip_config {
       ipv4 {
         address = "${each.value.ip}"
@@ -161,14 +137,16 @@ cloning every VM from the same template but applying each role's own cores/memor
   }
 }
 </code></pre>
+The full configuration is available on GitHub.
 </div>
 
 <h3 class="subheading">Handoff to Ansible</h3>
 Once VMs exist, <code>ansible_inventory.tf</code> pulls the IPs straight out of the same <code>vms</code> map and renders <code>inventory.tftpl</code> 
-into a real Ansible inventory at <code>ansible/inventory.ini</code>. I use Terraform's templatefile function (.tftpl).
+into an Ansible inventory at <code>ansible/inventory.ini</code>. 
+I use Terraform's templatefile function (.tftpl).
 
 <div class="infostack">
-<h4>Generated inventory groups</h4>
+<h4>Example</h4>
 <pre><code style="font-size: 14px; line-height: 1.3;">[control_plane]
 192.168.0.101 ansible_user=ansible
 
@@ -176,30 +154,27 @@ into a real Ansible inventory at <code>ansible/inventory.ini</code>. I use Terra
 192.168.0.102 ansible_user=ansible
 192.168.0.103 ansible_user=ansible
 
-[utility]
-192.168.0.104 ansible_user=ansible
-
-[cloudflared]
-192.168.0.105 ansible_user=ansible
+...
 
 [k3s_cluster:children]
 control_plane
 workers
 </code></pre>
+The <code>k3s_cluster:children</code> group is what lets the Ansible 
+playbook target the whole cluster without hardcoding which node is which.
 </div>
 
-Terraform never touches the OS beyond cloud-init and the initial SSH user, and Ansible never creates infrastructure. 
-The <code>k3s_cluster:children</code> group is what lets the Ansible playbook target the whole cluster without hardcoding which node is which.
+
+
 
 <div class="infostack">
-<h4>Why split it this way:</h4>
+<h4>Why split Terraform/Ansible</h4>
 <ul>
 <li>Re-running <code>terraform apply</code> won't reconfigure a VM's software, and re-running the Ansible playbook won't recreate VMs</li>
 <li>Infrastructure changes (resize a worker, add a node) and configuration changes (bump the k3s version) can be reasoned about and version controlled independently</li>
 <li>The generated inventory means there is no manually maintained IP list</li>
 </ul>
 </div>
-Planned changes in the future include: secrets management (move credentials from .tfvars into a vault) and remote state backend.
 <br>
 
 <h4>Source code on <a href="https://github.com/inkku3/primergy-lab/tree/main/terraform">GitHub</a>.</h4>

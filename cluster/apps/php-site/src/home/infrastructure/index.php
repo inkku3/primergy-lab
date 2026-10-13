@@ -26,61 +26,86 @@ Infrastructure overview
 </div>
 <div class="site-content-box">
 <h3 class="subheading">Summary</h3>
-A self-hosted platform built around Proxmox, Terraform, Ansible and Kubernetes using GitOps principles. 
-The project was created to learn production-style platform engineering while providing infrastructure for my own applications.
-There is a full deployment pipeline from <code>git push</code> to a live rolling update. No manual <code>kubectl</code> steps anywhere.
+This is a self-hosted platform built with Proxmox, Terraform, Ansible and Kubernetes following GitOps principles. 
+I built it to learn platform engineering in a realistic environment while hosting my own applications.
+The entire deployment process is automated, from a <code>git push</code> to a live rolling update in Kubernetes.
+The goal is to have zero manual <code>kubectl</code> steps.
+
+<br>
+<h4>Source code on GitHub</h4>
+<b><a href="https://github.com/inkku3/primergy-lab/tree/main">Current infrastructure</a></b><br>
+<b><a href="https://github.com/inkku3/kaatokanni400">Kaatokänni400</a></b><br>
+<b><a href="https://github.com/inkku3/keittokirja">Keittokirja</a></b><br>
+
+
 
 <div class="infostack">
-<h4>Goals:</h4>
+<h4>Highlights</h4>
 <ul>
-<li>Build a production-grade GitOps loop: Automate deployments from git push to live rolling updates.</li>
-<li>Match infrastructure complexity to actual requirements, avoiding unnecessary enterprise bloat for a homelab environment.</li>
-<li>Keep infrastructure provisioning (Terraform), configuration management (Ansible), and workload scheduling (Kubernetes) strictly decoupled.</li>
-<li>Understand workload distribution, resource limits, and I/O contention within a single physical host.</li>
+<li>Fully automated <b>GitOps</b> deployment pipeline (ArgoCD, Github Actions)</li>
+<li>Infrastructure managed as code with <b>Terraform</b></li>
+<li>Configuration management with <b>Ansible</b></li>
+<li><b>Kubernetes-based application hosting</b></li>
+<li>Monitoring with <b>Prometheus and Grafana</b></li>
+<li>Secure ingress through Cloudflare Tunnel</li>
 </ul>
 </div>
 
 <h3 class="subheading">Architecture</h3>
-The entire platform runs on a single enterprise-grade Fujitsu Primergy RX2530 M2 rack server via Proxmox. 
-Operating within a strict 120GB SSD storage constraint, Terraform provisions five VMs based on an Ubuntu Server cloud-init template, and Ansible handles the OS-level stack and K3s bootstrapping.
+The entire platform runs on a single <b>Fujitsu Primergy RX2530 M2</b> rack server via <b>Proxmox.</b>
+<br>
+Storage is limited to a 120 GB SSD, so resource usage is carefully managed.
+Terraform provisions five VMs based on an Ubuntu Server cloud-init template, 
+and Ansible handles the OS-level configuration and K3s bootstrapping.
+
+
+<table>
+  <tr>
+    <th>VM</th>
+    <th>Purpose</th>
+  </tr>
+  <tr>
+    <td>Control plane</td>
+    <td>Kubernetes control plane</td>
+  </tr>
+    <tr>
+    <td>Worker 1</td>
+    <td>Application workloads</td>
+  </tr>
+    <tr>
+    <td>Worker 2</td>
+    <td>Application workloads</td>
+  </tr>
+    <tr>
+    <td>Utility</td>
+    <td>Shared infrastructure services</td>
+  </tr>
+    <tr>
+    <td>Cloudflare Tunnel</td>
+    <td>External access</td>
+  </tr>
+</table>
+
+
+The VMs are sized according to their role rather than being identical. 
+This leaves more resources available for application workloads.
 <img class="zoomD" src="/infrastructure/img/arch_final.svg" id="architecture">
-Rather than cloning identical nodes, 
-the K3s cluster uses five VMs sized strictly by role (control-plane, two workers, utility, and a dedicated Cloudflare tunnel). 
-This was a deliberate choice as the control-plane and utility VMs don't run application pods, 
-so keeping them lean prevents them from wasting hardware resources that the application workers actually need.<br><br>
-Because everything runs on one physical host, this is workload distribution and fault isolation at the VM/pod level.
-As all virtual machines ultimately share the same hardware, 
-the platform provides workload isolation rather than true high availability. A hardware failure would still take down the entire environment.
+Although the platform uses multiple VMs and Kubernetes nodes, everything runs on a single physical server. 
+The design provides workload isolation, not true high availability.
+
 
 <div class="infostack">
-<h4>Why did I choose..</h4>
+<h4>Technology stack</h4>
 <ul>
-<li> <b>Proxmox</b> - provides enterprise-grade virtualization, snapshots and VM lifecycle management while remaining practical for a home lab. </li>
-<li><b>Terraform</b> - declarative infrastructure provisioning and reproducible VM creation</li>
-<li><b>Ansible</b> - idempotent server configuration, separates infra provisioning from configuration</li>
-<li><b>Kubernetes (k3s)</b> - lightweight enough for the hardware, still teaches real orchestration concepts</li>
-<li><b>Dual Ingress Strategy</b> - Cloudflare Tunnel handles all HTTPs traffic (terminating TLS without exposing inbound ports),
- while a direct router port-forward to a K3s LoadBalancer Service handles raw-TCP traffic (like Minecraft) that Cloudflare's free tier cannot proxy</li>
-<li><b>Argo CD / GitOps</b> - Git is the single source of truth. Every change is auditable and revertible through Git history</li>
+<li>Proxmox for virtualization</li>
+<li>Terraform for infrastructure provisioning</li>
+<li>Ansible for configuration management</li>
+<li>K3s for container orchestration</li>
+<li>Argo CD for GitOps delivery</li>
+<li>Cloudflare Tunnel and Traefik for ingress</li>
 </ul>
 </div>
 
-<h3 class="subheading">Automation pipeline (GitOps loop)</h3>
-Starting with a <code>git push</code> the diagram below shows how the GitOps pipeline works. GitHub Actions builds and pushes the images which are updated to the 
-running Kubernetes application using Argo CD Image Updater.
-
-<img class="zoomD" src="/infrastructure/img/GitOps_final.svg" id="gitops-graph">
-
-Argo CD Image Updater monitors the registry for new image versions and updates the image references in the application's <code>kustomization.yaml.</code>
-This Git commit becomes the desired state that Argo CD reconciles to the Kubernetes cluster, resulting in an automated rolling update without 
-manual deployment commands.<br>
-Every deployment is traceable through Git history. This is especially important as the infrastructure has grown quite large.
-
-<img class="zoomD-small" src="/infrastructure/img/request_final.svg" id="gitops-graph">
-This is how you accessed this site. Incoming requests pass through Cloudflare Tunnel to Traefik, 
-which routes traffic to the appropriate Kubernetes Service and ultimately the application Pod. 
-Cloudflare plays a major role, as there is no need to manually configure certificates, open ports, or local firewalls.
-WAF features allow region blocking. Currently only traffic from Finland and Sweden is allowed. 
 
 <h3 class="subheading">Current status</h3>
 <h4>Infrastructure</h4>
@@ -116,8 +141,8 @@ WAF features allow region blocking. Currently only traffic from Finland and Swed
     <td>Prometheus, Alertmanager, Grafana, kube-state-metrics, node-exporter</td>
   </tr>
   <tr>
-    <td>Tailscale</td>
-    <td>Planned</td>
+    <td>OpenVPN server</td>
+    <td style="color:#30D900">OK &#10004;</td>
     <td>Use a VPN to manage remotely</td>
   </tr>
   <tr>
@@ -142,7 +167,7 @@ WAF features allow region blocking. Currently only traffic from Finland and Swed
   <tr>
     <td>Keittokirja</td>
     <td>Kubernetes</td>
-    <td style="color:#F5A50F">In progress</td>
+    <td style="color:#30D900">Live &#10004;</td>
   </tr>
   <tr>
     <td>Kaatokänni400</td>
@@ -166,20 +191,21 @@ WAF features allow region blocking. Currently only traffic from Finland and Swed
   </tr>
 </table>
 <br>
-Not every project is hosted on the Kubernetes cluster. 
-<b><a href="https://inkku.xyz/projects/kaatokanni400/">Kaatokänni400</a> </b>currently runs on <b>Azure App Service</b> and is integrated into the portfolio through an nginx reverse proxy. 
+<b><a href="https://inkku.xyz/projects/kaatokanni400/">Kaatokänni400</a> </b>currently runs on 
+<b>Azure App Service</b> and is integrated into the portfolio through an nginx reverse proxy. 
 Its architecture and deployment pipeline are documented separately.
 <br>
 
 <h3>Design decisions and trade-offs</h3>
-As the entire setup runs on a single 120GB SSD this is a rather limited amount of storage.
-Due to this I explicitly rejected replicated storage solutions like Longhorn or OpenEBS. 
-For a single-node physical host, multi-node replication adds severe storage overhead and complexity to solve a fault-tolerance 
-problem this specific hardware setup doesn't even have.
+The goal was to learn production-style tooling without introducing unnecessary complexity.
+I deliberately chose K3s instead of a full Kubernetes distribution.
+<br>
+As the entire environment runs on a 120 GB SSD,
+ I chose not to use distributed storage solutions such as Longhorn or OpenEBS. 
+ In a single-server environment they would consume significant storage while providing 
+ little benefit, since all replicas would still depend on the same physical hardware.
 
-<h4>Source code on GitHub</h4>
-<b><a href="https://github.com/inkku3/primergy-lab/tree/main">Current infrastructure</a></b><br>
-<b><a href="https://github.com/inkku3/kaatokanni400">Kaatokänni400</a></b><br>
+
 
 </div>
 </div>
