@@ -19,6 +19,9 @@ prometheus:
 
 alertmanager:
   alertmanagerSpec:
+    # Mounts the Telegram token secret into the Alertmanager pod
+    secrets:
+      - alertmanager-telegram
     resources:
       requests:
         cpu: 50m
@@ -33,6 +36,43 @@ alertmanager:
           resources:
             requests:
               storage: 1Gi
+  config:
+    global:
+      resolve_timeout: 5m
+    route:
+      receiver: telegram
+      group_by: ['alertname', 'namespace', 'instance']
+      group_wait: 30s
+      group_interval: 5m
+      repeat_interval: 4h
+      routes:
+        # Heartbeat alerts that always fire: drop them
+        - receiver: "null"
+          matchers:
+            - alertname =~ "Watchdog|InfoInhibitor"
+        # Low-importance noise: drop it
+        - receiver: "null"
+          matchers:
+            - severity = "info"
+    inhibit_rules:
+      # If a critical alert fires, mute the matching warning
+      - source_matchers: ['severity = "critical"']
+        target_matchers: ['severity = "warning"']
+        equal: ['alertname', 'namespace', 'instance']
+    receivers:
+      - name: "null"
+      - name: telegram
+        telegram_configs:
+          - bot_token_file: /etc/alertmanager/secrets/alertmanager-telegram/bot_token
+            chat_id: 7060410951
+            parse_mode: HTML
+            send_resolved: true
+            message: |-
+              {{ if eq .Status "firing" }}🔥{{ else }}✅{{ end }} <b>[{{ .Status | toUpper }}] {{ .CommonLabels.alertname }}</b> ({{ .CommonLabels.severity }})
+              {{ range .Alerts }}
+              {{ .Annotations.summary }}
+              {{ .Annotations.description }}
+              {{ end }}
 
 grafana:
   persistence:
