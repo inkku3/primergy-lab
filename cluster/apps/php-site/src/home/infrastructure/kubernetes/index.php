@@ -34,7 +34,7 @@ No workloads are deployed manually with kubectl.
   Scaling or replacing a pod carries zero risk of data loss.</li>
   <li><b>StatefulSets (Minecraft, MariaDB)</b> - These workloads depend on PersistentVolumeClaims and benefit from predictable pod naming and storage assignment.</li>
 </ul>
-<br><br>
+<br>
 <h3 class="subheading">Example: php-site</h3>
 <code>php-site</code> is split into a <code>php-deployment</code> (PHP-FPM) and an <code>nginx-deployment</code>, each with its own Service. 
 nginx serves static content, routes PHP requests to <code>php-service:9000</code> over FastCGI, 

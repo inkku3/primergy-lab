@@ -26,74 +26,47 @@ Monitoring & Observability
 </div>
 <div class="site-content-box">
 <h3 class="subheading">Summary</h3>
-The observability platform provides full cluster visibility, metric collection, and alerting using the standard community 
-<code>kube-prometheus-stack</code> Helm release managed entirely via GitOps.
+The platform uses the community <code>kube-prometheus-stack</code> Helm chart for metrics collection, visualization and alerting.
 
-Rather than clicking dashboards together manually in a web UI that wouldn't survive a cluster rebuild, the entire monitoring setup including metrics storage, 
-scrape targets, alerting rules, and Grafana dashboard definitions is declared in version control and reconciled automatically by ArgoCD.
-
+The stack is deployed through Argo CD and managed entirely through GitOps. 
+Dashboard definitions, retention settings, alert routing and application-specific monitoring resources live 
+in Git and are reconciled automatically with the cluster.
 <div class="infostack">
-<h4>Key Objectives:</h4>
+<h4>Components</h4>
 <ul>
-<li><b>Declarative Configuration:</b> Provision the entire observability stack as code, making dashboards and alerting rules fully reviewable and reproducible.</li>
-<li><b>Resource Safeguards:</b> Strict metrics retention bounds to prevent time-series database growth from overwhelming the host's 120GB SSD storage constraint.</li>
-<li><b>Workload Isolation:</b> Eliminate disk I/O contention between heavy time-series writes and dashboard database operations on shared hardware.</li>
-<li><b>GitOps-Native Deployment:</b> Handle helm chart multi-source references and CRD size limits cleanly within ArgoCD.</li>
+<li><b>Prometheus Operator</b> - Manages Prometheus, Alertmanager and monitoring CRDs</li>
+<li><b>Prometheus</b> - Metrics collection, storage and alert evaluation</li>
+<li><b>Alertmanager</b> - Groups and routes alerts to Telegram</li>
+<li><b>Grafana</b> - Dashboards and visualization</li>
+<li><b>node-exporter</b> - Host-level metrics for CPU, memory, storage and networking</li>
+<li><b>kube-state-metrics</b> - Metrics derived from Kubernetes object state</li>
 </ul>
 </div>
+Grafana and Prometheus are intentionally only accessible through the 
+management network and are not exposed through the public Cloudflare Tunnel.
 
-<h3 class="subheading">Stack Architecture</h3>
-The stack combines metrics harvesting, time-series storage, alert evaluation, and visualization into a unified deployment.
-
-<table>
-  <tr>
-    <th>Component</th>
-    <th>Role</th>
-    <th>Deployment Method</th>
-  </tr>
-  <tr>
-    <td><b>Prometheus</b></td>
-    <td>Metrics scraper and time-series database (TSDB)</td>
-    <td>Helm (<code>kube-prometheus-stack</code>)</td>
-  </tr>
-  <tr>
-    <td><b>Grafana</b></td>
-    <td>Metrics visualization and dashboard frontend</td>
-    <td>Helm + Sidecar ConfigMaps</td>
-  </tr>
-  <tr>
-    <td><b>Alertmanager</b></td>
-    <td>Alert routing, deduplication, and silencing</td>
-    <td>Helm (<code>kube-prometheus-stack</code>)</td>
-  </tr>
-  <tr>
-    <td><b>node-exporter</b></td>
-    <td>OS and hardware-level host metrics (CPU, RAM, disk I/O)</td>
-    <td>DaemonSet via Helm</td>
-  </tr>
-  <tr>
-    <td><b>kube-state-metrics</b></td>
-    <td>Listens to the K8s API server and generates object state metrics</td>
-    <td>Deployment via Helm</td>
-  </tr>
-</table>
-
+<h3 class="subheading">Alerting</h3>
+Prometheus evaluates the default alert rules shipped with <code>kube-prometheus-stack</code>. 
+When an alert fires, it is sent to Alertmanager, which routes notifications to a Telegram chat. That means
+real-time alerts on the go straight to my phone.
 <h3 class="subheading">GitOps & Dashboards as Code</h3>
 
 <h4>Dashboards in version control</h4>
-To prevent dashboards from becoming unbacked state trapped inside Grafana's internal database, dashboard definitions are stored as JSON files directly in Git. 
-<br><br>
-These JSON files are rendered as Kubernetes <code>ConfigMap</code> resources labeled for Grafana's sidecar container. 
-The sidecar watches for tagged ConfigMaps and automatically mounts them into Grafana live, keeping dashboard management entirely within the standard Git workflow.
+Grafana dashboards are stored as JSON files in Git rather than 
+being created manually through the Grafana web interface.<br><br>
+During deployment, dashboard definitions are rendered into Kubernetes ConfigMaps 
+labelled for Grafana's sidecar container. The sidecar continuously watches for dashboard ConfigMaps and loads them automatically.
 
-<h4>Bounded Retention Strategy</h4>
-On a hardware setup with storage constraints, time-based metric retention alone is a liability. 
-A sudden spike in pod churn or scrape targets can fill the disk before the time window expires. Prometheus retention is explicitly dual-bounded:
+<h4>Storage constraints and retention</h4>
+The entire platform runs on a server with a 120 GB SSD, so monitoring storage must be treated carefully.
+
+Prometheus retention is explicitly dual-bounded:
 <ul>
   <li><b>Time-based limit:</b> <code>15d</code> retention window.</li>
   <li><b>Size-based cap:</b> <code>retentionSize: 8GB</code> hard ceiling.</li>
 </ul>
 Enforcing an absolute size cap ensures that unexpected scrape volume never silently consumes worker node disk space.
+The Prometheus PVC itself is slightly larger (10 GiB) to leave room for write-ahead logs and compaction operations.
 
 <div class="infostack">
 <h4>Multi-Source ArgoCD Pattern</h4>
@@ -101,23 +74,18 @@ The monitoring stack uses ArgoCD's multi-source Application feature. A single Ap
 <ol>
   <li>The remote community <code>kube-prometheus-stack</code> Helm chart repository.</li>
   <li>Git-managed <code>values.yaml</code> overrides for local configuration.</li>
-  <li>Plain Git manifests for supplementary resources (ConfigMaps, extra RBAC).</li>
+  <li>Additional Kubernetes manifests such as dashboards and ServiceMonitors</li>
 </ol>
-This keeps the deployment under a single lifecycle status, health check, and rollback target.
 </div>
 
 <h3 class="subheading">Future Improvements</h3>
 <ul>
   <li><b>ServiceMonitors for Applications:</b> Extend scrape coverage to application-level metrics by adding <code>ServiceMonitor</code> 
   CRDs for Traefik ingress and Matomo's PHP-FPM exporter.</li>
-  <li><b>Alertmanager Webhooks:</b> Integrate Alertmanager with a Discord webhook channel to push critical cluster alerts automatically without manual 
-  Grafana inspection.</li>
-  <li><b>External DB for Grafana:</b> Migrate Grafana's persistent store from local SQLite to the existing MariaDB instance if disk contention 
-  emerges during future scaling.</li>
 </ul>
 
 <h4>Source Code on GitHub</h4>
-<b><a href="https://github.com/inkku3/primergy-lab/tree/main">Current Infrastructure Repository</a></b><br>
+<b><a href="https://github.com/inkku3/primergy-lab/">Current Infrastructure Repository</a></b><br>
 
 </div>
 </div>
