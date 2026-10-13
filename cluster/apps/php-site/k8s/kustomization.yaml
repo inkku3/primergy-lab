@@ -10,4 +10,4 @@ images:
   - name: ghcr.io/inkku3/primergy-lab-php
     newTag: 40a33c8e4931aa8b440f93d1290c000f24d6dc1b
   - name: ghcr.io/inkku3/primergy-lab-nginx
-    newTag: 073cc96cb71003b3f5cc291e122f4435c2966382
+    newTag: 40a33c8e4931aa8b440f93d1290c000f24d6dc1b
