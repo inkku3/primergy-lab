@@ -68,11 +68,23 @@ alertmanager:
             parse_mode: HTML
             send_resolved: true
             message: |-
-              {{ if eq .Status "firing" }}🔥{{ else }}✅{{ end }} <b>[{{ .Status | toUpper }}] {{ .CommonLabels.alertname }}</b> ({{ .CommonLabels.severity }})
-              {{ range .Alerts }}
+              {{ range .Alerts }}{{ if eq .Status "resolved" }}FIXED{{ else }}ALERT{{ end }}: <b>{{ .Labels.alertname }}</b>
               {{ .Annotations.summary }}
-              {{ .Annotations.description }}
               {{ end }}
+
+kubeControllerManager:
+  enabled: false
+kubeScheduler:
+  enabled: false
+kubeProxy:
+  enabled: false
+
+defaultRules:
+  rules:
+    kubeControllerManager: false
+    kubeSchedulerAlerting: false
+    kubeSchedulerRecording: false
+    kubeProxy: false
 
 grafana:
   persistence:
