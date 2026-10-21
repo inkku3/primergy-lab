@@ -8,6 +8,6 @@ resources:
   - ingress.yaml
 images:
   - name: ghcr.io/inkku3/primergy-lab-php
-    newTag: 40a33c8e4931aa8b440f93d1290c000f24d6dc1b
+    newTag: 967e64a207401ce0fcabb793f63ac9dd1bf30692
   - name: ghcr.io/inkku3/primergy-lab-nginx
-    newTag: 40a33c8e4931aa8b440f93d1290c000f24d6dc1b
+    newTag: 967e64a207401ce0fcabb793f63ac9dd1bf30692
