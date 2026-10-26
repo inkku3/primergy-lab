@@ -10,88 +10,85 @@ $pageTitle = "inkku - minecraft implementation";
 </div>
 <div class="site-content-box">
 <h3 class="subheading">Summary</h3>
-This project demonstrates operating a stateful application on my self-hosted Kubernetes cluster using GitOps principles. 
-The server runs PaperMC and is deployed entirely from declarative Kubernetes manifests stored in Git and synchronised automatically by ArgoCD.
+This is a PaperMC Minecraft server running on my self-hosted Kubernetes cluster. 
+Everything is deployed from manifests in Git, and ArgoCD keeps the cluster in sync with them.
 
-The project showcases persistent storage management, secret handling, networking, ingress configuration, 
-and deployment automation within a homelab environment.
+It was a good excuse to work through persistent storage, secrets, networking and ingress on a real workload in my homelab.
 
-The deployment is intentionally scoped for a small private server (max 10 concurrent players on a single-node cluster), 
-which informed several design decisions. These include using a single-replica StatefulSet rather than a multi-node game server orchestration platform, 
-and exposing the game server through a LoadBalancer Service instead of introducing additional proxy layers.
+I built it for a small private server, with at most 10 players at a time on a single-node cluster, and that shaped a few choices. 
+I used a single-replica StatefulSet instead of a game server orchestration platform, 
+and exposed the server through a LoadBalancer Service instead of putting a proxy in front of it.
 
 <div class="infostack">
 <h4>Architecture</h4>
-The deployment consists of:
+The setup consists of:
 <ul>
-<li>Kubernetes StatefulSet providing stable pod identity and persistent storage for the PaperMC server</li>
-<li>PersistentVolumeClaim for world and plugin data</li>
-<li>Kubernetes LoadBalancer Service exposing Minecraft and RCON</li>
-<li>Traefik Ingress exposing the SquareMap web interface</li>
-<li>Cloudflare Tunnel publishing SquareMap on a dedicated subdomainn</li>
-<li>Kubernetes Secrets storing sensitive configuration such as RCON credentials and the DiscordSRV bot token</li>
-<li>PaperMC running from the <a href="https://github.com/itzg/docker-minecraft-server"><code>itzg/minecraft-server</code></a> container image</li>
+<li>A StatefulSet for the PaperMC server, giving it a stable identity and persistent storage</li>
+<li>A PersistentVolumeClaim for world and plugin data</li>
+<li>A LoadBalancer Service for Minecraft and RCON</li>
+<li>A Traefik Ingress for the SquareMap web interface</li>
+<li>A Cloudflare Tunnel that publishes SquareMap on its own subdomain</li>
+<li>Kubernetes Secrets for the RCON credentials and the DiscordSRV bot token</li>
+<li>The <a href="https://github.com/itzg/docker-minecraft-server"><code>itzg/minecraft-server</code></a> container image, which runs PaperMC</li>
 </ul>
 </div>
 <br>
 <h3 class="subheading">Deployment</h3>
-The server is managed through GitOps.
+The server is managed with GitOps.
 
-Infrastructure and application configuration are version-controlled in Git. 
-When changes are committed, ArgoCD automatically reconciles the cluster state, ensuring deployments remain consistent without manual intervention.
+All infrastructure and application config lives in Git. 
+When I push a change, ArgoCD applies it to the cluster, so I never have to deploy anything by hand.
 
-Configuration is managed primarily through Kubernetes manifests and environment variables, allowing server settings to be modified declaratively.
+Most settings are controlled through the manifests and environment variables, so changing the server config just means editing a file and committing it.
 
 <h4 class="subheading">Storage</h4>
-Minecraft is a stateful application, making persistent storage essential.
+A Minecraft server keeps a lot of state, so it needs persistent storage.
 
-The server is deployed as a Kubernetes StatefulSet with a PersistentVolumeClaim, ensuring that world data, 
-player information and plugin configuration survive pod restarts and upgrades.
+The server runs as a StatefulSet with a PersistentVolumeClaim, so the world, player data and plugin config survive pod restarts and upgrades.
 
-This separates application configuration from persistent data while allowing the workload to be recreated without data loss.
+The pod can be deleted and recreated without losing anything, because the data lives separately from the application config.
 
 <h4 class="subheading">Networking</h4>
-The deployment exposes two separate services:<br>
+Two things are exposed:<br>
 <br>
 <b>Minecraft Server</b>
 <ul>
-<li>Exposed through a Kubernetes LoadBalancer Service provided by k3s ServiceLB</li>
-<li>TCP connectivity for Minecraft clients</li>
-<li>Router port forwarding directs external traffic to the LoadBalancer Service</li>
-<li>RCON available for local administration</li>
-<li>DiscordSRV provides integration between the game server and Discord for remote administration</li>
+<li>Runs behind a LoadBalancer Service provided by k3s ServiceLB</li>
+<li>Accepts TCP connections from Minecraft clients</li>
+<li>My router forwards the external port to the LoadBalancer Service</li>
+<li>RCON is only available locally</li>
+<li>DiscordSRV connects the server to Discord, which I use for remote administration</li>
 </ul>
-To reduce automated scan traffic and log noise, the server listens on a non-default port. 
-A DNS SRV record allows players to connect using a standard hostname without specifying the port.
+The server listens on a non-default port to cut down on automated scans and log spam. 
+A DNS SRV record lets players connect with just the hostname, without typing the port.
+<br><br>
 <b>SquareMap</b>
 <ul>
-<li>Published through a dedicated Traefik Ingress</li>
-<li>Accessible via its own subdomain</li>
-<li>Exposed externally using a Cloudflare Tunnel</li>
+<li>Published through its own Traefik Ingress</li>
+<li>Available on its own subdomain</li>
+<li>Exposed to the internet through a Cloudflare Tunnel</li>
 </ul>
 
 <h4 class="subheading">Security</h4>
-Sensitive configuration, including RCON credentials and the DiscordSRV bot token, is stored as Kubernetes Secrets rather than in version-controlled manifests.
+The RCON credentials and the DiscordSRV bot token are stored as Kubernetes Secrets, so they never end up in the Git repo.
 
-DiscordSRV manages its own configuration file, so instead of replacing the file with a Secret mount, an 
-initContainer injects only the bot token into the plugin's generated configuration during startup. 
-This preserves the plugin's ability to manage its own configuration while keeping credentials outside version control.
+DiscordSRV generates and manages its own config file, so mounting a Secret over it would break that. 
+Instead, an initContainer writes just the bot token into the generated config at startup. 
+The plugin can still manage its own config, and the token stays out of version control.
 <br><br>
-The SquareMap web interface is published through a Cloudflare Tunnel, preventing direct public exposure of the service. 
-Only the Minecraft game port is directly exposed to the internet.
+SquareMap goes through a Cloudflare Tunnel, so it is never directly exposed to the internet. 
+The Minecraft game port is the only thing open to the public.
 
 <h3 class="subheading">Design Decisions</h3>
-Several implementation choices were driven by the differing requirements of the services being hosted. 
-Because Minecraft requires direct TCP connectivity, the game server is exposed through a router port forward to a Kubernetes LoadBalancer Service. 
-On this single-node k3s cluster, the built-in ServiceLB provides external connectivity without requiring MetalLB or additional load balancing components.
+The two services have different needs, so I exposed them differently. 
+Minecraft needs a raw TCP connection, so the game server sits behind a router port forward pointing at a LoadBalancer Service. 
+On a single-node k3s cluster, the built-in ServiceLB handles this fine, so I didn't need MetalLB or anything else.
 <br><br>
-HTTP services, such as SquareMap, are instead published through Traefik and Cloudflare Tunnel, avoiding direct exposure while benefiting from standard HTTP routing.
+HTTP services like SquareMap go through Traefik and a Cloudflare Tunnel instead. That gives me normal HTTP routing without opening a port to the internet.
 <br><br>
-The deployment also balances declarative infrastructure with mutable application state. An initial player whitelist is seeded from a Git-managed Secret during 
-deployment, providing a reproducible baseline for disaster recovery. Subsequent whitelist changes are performed through DiscordSRV or RCON and are preserved across 
-pod restarts rather than being overwritten by Git reconciliation.
+I also had to decide what belongs in Git and what doesn't. The initial player whitelist comes from a Git-managed Secret, which gives me a known starting point if I ever have to rebuild from scratch. 
+After that, whitelist changes are made through DiscordSRV or RCON, and they persist across pod restarts instead of being overwritten when Git syncs.
 <br><br>
-Future improvements include automated backups of persistent world data and plugin configuration
 <h4>Source code on <a href="https://github.com/inkku3/primergy-lab/">GitHub</a>.</h4>
 
 </div>
