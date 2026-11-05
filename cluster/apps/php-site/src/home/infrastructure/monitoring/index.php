@@ -68,7 +68,6 @@ Keeping the endpoint active avoids that initial delay. UptimeRobot pings it ever
 Grafana dashboards are stored as JSON files in Git rather than 
 being created manually through the Grafana web interface.<br><br>
 
-<br><br>
 The monitoring stack uses ArgoCD's multi-source Application feature. A single Application object combines:
 <ol>
   <li>The remote community <code>kube-prometheus-stack</code> Helm chart repository.</li>
