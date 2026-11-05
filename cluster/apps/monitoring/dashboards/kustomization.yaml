@@ -20,11 +20,11 @@ configMapGenerator:
       labels:
         grafana_dashboard: "1"
 
-  #- name: dashboard-homelab-overview
-  #  files:
-  #    - homelab-overview.json
-  #  options:
-  #    labels:
-  #      grafana_dashboard: "1"
+  - name: dashboard-homelab-overview
+    files:
+      - homelab-overview.json
+    options:
+      labels:
+        grafana_dashboard: "1"
 generatorOptions:
   disableNameSuffixHash: true    # keeps ConfigMap names stable across syncs
