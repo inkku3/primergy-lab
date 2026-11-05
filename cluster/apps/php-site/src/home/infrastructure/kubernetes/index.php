@@ -50,6 +50,7 @@ Most traffic stays inside the cluster. Static files are served directly by nginx
 forwarded to the PHP-FPM deployment through the internal Kubernetes service.
 <div class="infostack">
 <h4>home.conf</h4>
+The <code>/projects/kaatokanni400/</code> path is an exception. 
 <pre><code>location / {
   try_files $uri $uri/ /index.php?$query_string;
 }
@@ -60,7 +61,6 @@ location /projects/kaatokanni400/ {
 }
 </code></pre>
 </div>
-The <code>/projects/kaatokanni400/</code> path is an exception. 
 Requests matching that route are reverse proxied to an Azure App Service instance instead of a 
 Kubernetes workload.<br><br>
 The application has its own deployment pipeline and hosting environment, but nginx makes it look like part of 
@@ -100,11 +100,11 @@ within <code>inkku.xyz</code>, the request path.
 Running workloads on a single physical host with strict resource constraints (120GB SSD, shared RAM) highlighted several operational realities.
 <div class="infostack">
 <ul>
-<li><b>Resource limits</b>Currently, workloads run without strict requests and limits. On a hardware-constrained 
+<li><b>Resource limits</b> - Currently, workloads run without strict requests and limits. On a hardware-constrained 
 server, an unconstrained pod 
 (e.g., Prometheus ingestion spikes) risks causing OOM (Out Of Memory) kills on neighboring workloads. 
 <li><b>No liveness/readiness probes</b> - Kubernetes has no way to know if PHP-FPM or nginx is actually healthy versus just running.</li>
-<li><b>Anti-affinity rules</b>To prevent disk I/O bottlenecks, high-volume disk writers are explicitly separated. 
+<li><b>Anti-affinity rules</b> - To prevent disk I/O bottlenecks, high-volume disk writers are explicitly separated. 
 For example, Grafana and Prometheus utilize <code>podAntiAffinity</code> to prevent co-location on the same worker 
 node.</ul>
 </div>

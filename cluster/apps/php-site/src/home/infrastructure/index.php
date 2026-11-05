@@ -45,8 +45,8 @@ The goal is to have zero manual <code>kubectl</code> steps.
 <li>Fully automated <b>GitOps</b> deployment pipeline (ArgoCD, Github Actions)</li>
 <li>Infrastructure managed as code with <b>Terraform</b></li>
 <li>Configuration management with <b>Ansible</b></li>
-<li><b>Kubernetes-based application hosting</b></li>
-<li>Monitoring with <b>Prometheus and Grafana</b></li>
+<li><b>Kubernetes-based</b> application hosting</li>
+<li>Monitoring with <b>Prometheus</b> and <b>Grafana</b></li>
 <li>Secure ingress through Cloudflare Tunnel</li>
 </ul>
 </div>
@@ -86,7 +86,7 @@ and Ansible handles the OS-level configuration and K3s bootstrapping.
   </tr>
 </table>
 
-
+<br><br>
 The VMs are sized according to their role rather than being identical. 
 This leaves more resources available for application workloads.
 <img class="zoomD" src="/infrastructure/img/arch_final.svg" id="architecture">
@@ -165,17 +165,17 @@ The design provides workload isolation, not true high availability.
     <td style="color:#30D900">Live &#10004;</td>
   </tr>
   <tr>
-    <td>Keittokirja</td>
+    <td><a href="https://keittokirja.inkku.xyz">Keittokirja</a></td>
     <td>Kubernetes</td>
     <td style="color:#30D900">Live &#10004;</td>
   </tr>
   <tr>
-    <td>Kaatokänni400</td>
+    <td><a href="https://inkku.xyz/projects/kaatokanni400/">Kaatokänni400</a></td>
     <td>Azure App Service</td>
     <td style="color:#30D900">Live &#10004;</td>
   </tr>
   <tr>
-    <td>Minecraft server</td>
+    <td><a href="https://minecraft.inkku.xyz/">Minecraft server</a></td>
     <td>Kubernetes</td>
     <td style="color:#30D900">Live &#10004;</td>
   </tr>
@@ -195,11 +195,11 @@ The design provides workload isolation, not true high availability.
 <b>Azure App Service</b> and is integrated into the portfolio through an nginx reverse proxy. 
 Its architecture and deployment pipeline are documented separately.
 <br>
-
+<br>
 <h3>Design decisions and trade-offs</h3>
 The goal was to learn production-style tooling without introducing unnecessary complexity.
 I deliberately chose K3s instead of a full Kubernetes distribution.
-<br>
+<br><br>
 As the entire environment runs on a 120 GB SSD,
  I chose not to use distributed storage solutions such as Longhorn or OpenEBS. 
  In a single-server environment they would consume significant storage while providing 

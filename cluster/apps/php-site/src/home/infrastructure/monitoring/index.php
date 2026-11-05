@@ -28,57 +28,55 @@ Monitoring & Observability
 <h3 class="subheading">Summary</h3>
 The platform uses the community <code>kube-prometheus-stack</code> Helm chart for metrics collection, visualization and alerting.
 
-The stack is deployed through Argo CD and managed entirely through GitOps. 
-Dashboard definitions, retention settings, alert routing and application-specific monitoring resources live 
-in Git and are reconciled automatically with the cluster.
+It is deployed through Argo CD and managed through GitOps so dashboard definitions, alert rules and configuration is stored in Git.
 <div class="infostack">
 <h4>Components</h4>
 <ul>
 <li><b>Prometheus Operator</b> - Manages Prometheus, Alertmanager and monitoring CRDs</li>
 <li><b>Prometheus</b> - Metrics collection, storage and alert evaluation</li>
-<li><b>Alertmanager</b> - Groups and routes alerts to Telegram</li>
+<li><b>Alertmanager</b> - Groups and routes alerts to a Telegram bot</li>
 <li><b>Grafana</b> - Dashboards and visualization</li>
 <li><b>node-exporter</b> - Host-level metrics for CPU, memory, storage and networking</li>
-<li><b>kube-state-metrics</b> - Metrics derived from Kubernetes object state</li>
+<li><b>kube-state-metrics</b> - exposes metrics about Kubernetes resources and their state</li>
 </ul>
 </div>
-Grafana and Prometheus are intentionally only accessible through the 
-management network and are not exposed through the public Cloudflare Tunnel.
 
-<h3 class="subheading">Alerting</h3>
-Prometheus evaluates the default alert rules shipped with <code>kube-prometheus-stack</code>. 
-When an alert fires, it is sent to Alertmanager, which routes notifications to a Telegram chat. That means
-real-time alerts on the go straight to my phone.
-<h3 class="subheading">GitOps & Dashboards as Code</h3>
-
-<h4>Dashboards in version control</h4>
-Grafana dashboards are stored as JSON files in Git rather than 
-being created manually through the Grafana web interface.<br><br>
-During deployment, dashboard definitions are rendered into Kubernetes ConfigMaps 
-labelled for Grafana's sidecar container. The sidecar continuously watches for dashboard ConfigMaps and loads them automatically.
-
-<h4>Storage constraints and retention</h4>
-The entire platform runs on a server with a 120 GB SSD, so monitoring storage must be treated carefully.
-
-Prometheus retention is explicitly dual-bounded:
+<h4 class="subheading">Alerting</h4>
+Prometheus evaluates the configured alert rules and forwards firing alerts to Alertmanager, which routes notifications to my Telegram bot. 
+That means real-time alerts go straight to my phone.<br><br>
+This is especially useful considering the small, singular disk that the server is running on.
+<br><br>
+Prometheus storage is also limited due to this:
 <ul>
   <li><b>Time-based limit:</b> <code>15d</code> retention window.</li>
   <li><b>Size-based cap:</b> <code>retentionSize: 8GB</code> hard ceiling.</li>
 </ul>
-Enforcing an absolute size cap ensures that unexpected scrape volume never silently consumes worker node disk space.
-The Prometheus PVC itself is slightly larger (10 GiB) to leave room for write-ahead logs and compaction operations.
+The Prometheus PVC is 10 GiB, leaving some additional room for write-ahead logs and compaction operations.
 
-<div class="infostack">
-<h4>Multi-Source ArgoCD Pattern</h4>
+
+<h4 class="subheading">External monitoring</h4>
+In addition to the internal Prometheus monitoring, I use UptimeRobot to monitor the website and KaatoKänni400 on Azure. 
+In the event a fault occurs that takes down internal monitoring I get an email notification via UptimeRobot.
+<br><br>
+The Azure monitor also serves another purpose. Regular requests keep the frontend active and prevent it from going idle. 
+Previously, the backend could go to sleep, resulting in a delay of around a minute before the application became reachable again. 
+Keeping the endpoint active avoids that initial delay. UptimeRobot pings it every 2 minutes.
+
+
+<h3 class="subheading">GitOps & Dashboards as Code</h3>
+
+Grafana dashboards are stored as JSON files in Git rather than 
+being created manually through the Grafana web interface.<br><br>
+
+<br><br>
 The monitoring stack uses ArgoCD's multi-source Application feature. A single Application object combines:
 <ol>
   <li>The remote community <code>kube-prometheus-stack</code> Helm chart repository.</li>
   <li>Git-managed <code>values.yaml</code> overrides for local configuration.</li>
   <li>Additional Kubernetes manifests such as dashboards and ServiceMonitors</li>
 </ol>
-</div>
 
-<h3 class="subheading">Future Improvements</h3>
+<h4 class="subheading">Future Improvements</h4>
 <ul>
   <li><b>ServiceMonitors for Applications:</b> Extend scrape coverage to application-level metrics by adding <code>ServiceMonitor</code> 
   CRDs for Traefik ingress and Matomo's PHP-FPM exporter.</li>

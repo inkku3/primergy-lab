@@ -36,7 +36,7 @@ which routes traffic to the appropriate Kubernetes Service and ultimately the ap
 Cloudflare plays a major role, as there is no need to manually configure certificates, open ports, or local firewalls.
 WAF features allow region blocking. Currently only traffic from Finland and Sweden is allowed.
 
-<h4>Traffic paths</h4>
+<h3>Traffic paths</h3>
 The platform currently exposes two different types of traffic.
 <ul>
   <li><b>HTTP(s) (websites, Matomo, dashboards)</b> - websites, monitoring dashboards and other web applications are published through Cloudflare Tunnel</li>
@@ -55,7 +55,7 @@ The platform currently exposes two different types of traffic.
 </ol>
 </div>
 
-<h3 class="subheading">Traefik vs. the application's nginx</h3>
+<h4 class="subheading">Traefik vs. the application's nginx</h4>
 nginx is not the cluster ingress. Routing decisions happen at two different layers:
 
 <div class="infostack">
@@ -66,7 +66,7 @@ nginx is not the cluster ingress. Routing decisions happen at two different laye
 </div>
 Traefik's job is only selecting the right Service. What that Service's Pod does with the request from there is application logic, not cluster infrastructure.
 
-<h3 class="subheading">Why the tunnel gets its own VM</h3>
+<h4 class="subheading">Why the tunnel gets its own VM</h4>
 cloudflared runs on a dedicated, minimal VM (1 vCPU / 1GB) rather than as a Pod inside the k3s cluster.
 <div class="infostack">
 <ul>
@@ -74,7 +74,7 @@ cloudflared runs on a dedicated, minimal VM (1 vCPU / 1GB) rather than as a Pod 
 <li>The tunnel performs a single task and has very small resource requirements, making it easy to reason about and rebuild.</li>
 </ul>
 </div>
-
+The site and all applications are excluded from search engine indexing. This with the WAF block has eliminated almost all unwanted traffic.
 <h3 class="subheading">Cloudflare's role beyond the tunnel</h3>
 Alongside the Tunnel, Cloudflare handles DNS, TLS termination, and access control before traffic ever reaches the home network.
 <div class="infostack">
@@ -95,6 +95,7 @@ Applications are exposed through Cloudflare Tunnel, while administrative access 
 When connected through the VPN, I can:
 
 <ul>
+<li>Access iRMC on the server hardware</li>
 <li>Access the Proxmox management interface</li>
 <li>SSH into virtual machines</li>
 <li>Manage the Kubernetes cluster directly</li>
@@ -108,6 +109,7 @@ This keeps infrastructure management separate from public application ingress an
 <ul>
 <li><b>Tunnel routing isn't version-controlled</b> - Right now, mapping <code>inkku.xyz</code> to the in-cluster Traefik service requires manual clicks in the 
 Cloudflare Zero Trust dashboard. This breaks the strict GitOps philosophy used everywhere else in the project. 
+<br><br>
 The planned fix is to adopt the Cloudflare Terraform provider to manage the tunnel, ingress rules, and DNS records declaratively alongside the VMs. 
 This ensures that if the tunnel configuration is ever lost, recreating it is just a <code>terraform apply</code> away, requiring zero manual UI clicks.</li>
 </ul>
